@@ -16,7 +16,7 @@ for linkObj in linkList:
     sourceId = linkObj["source"]
     targetId = linkObj["target"]
     nodeDict[sourceId]["children"].append(targetId)
-    nodeDict[targetId]["children"].append(sourceId)
+    nodeDict[targetId]["parents"].append(sourceId)
 
 with open("../data/nodesWithLinks.json", "w") as outfile:
     json.dump(list(nodeDict.values()), outfile, indent=4)
