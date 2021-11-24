@@ -4,15 +4,31 @@
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
 
+<style>
+    .fakeRootElements {
+        visibility: hidden;
+    }
+</style>
+
 <!-- Create a div where the graph will take place -->
-<div id="viz"></div>
+<div id="viz">
+    <svg>
+        <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+</div>
 
 <script>
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
     var linkData;   // list of links
     var nodeLookup = {};    // maps node id to node object for easy lookup
-    var rootNodes;
+    var fakeRoot;   // used to store all level 0 nodes as children for easier drawing
+    
     d3.json("data/nodesAndLinks.json").then(function(data) {
         nodeData = data.nodes;
         linkData = data.links;
@@ -24,12 +40,10 @@
             nodeLookup[nodeObj.id] = nodeObj;
         });
         preprocessData();   // transform data into the format we want
-        rootNodes = transformToNested();
-        rootNodes.forEach(function (rootNode) {
-            Tree(rootNode, {
-                label: d => d.id,
-                width: 1000
-            });
+        rootNode = transformToNested();
+        Tree(rootNode, {
+            label: d => d.timestamp,
+            width: 1000
         });
     });
     function preprocessData() {
@@ -87,16 +101,23 @@
                 }
             });
         });
-        let onlyRootNodes = []
+        let fakeRootNode = {
+            id: "0",
+            children: []
+        };
         for (let i = 0; i < nodeData.length; i++) {
-            if (nodeData[i].directParent == null && nodeData[i].children.length > 0) {
-                onlyRootNodes.push(nodeData[i]);
+            if (nodeData[i].directParent == null /*&& nodeData[i].children.length > 0*/) {
+                fakeRootNode.children.push(nodeData[i]);
             }
         }
-        return onlyRootNodes;
+        fakeRootNode.children.sort((a, b) => a.timestamp - b.timestamp);
+        return fakeRootNode;
     }
     /* end of data loading and preprocessing */
 
+    // Copyright 2021 Observable, Inc.
+    // Released under the ISC license.
+    // https://observablehq.com/@d3/tree
     function Tree(data, { // data is either tabular (array of objects) or hierarchy (nested objects)
         path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
         id = Array.isArray(data) ? d => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
@@ -157,7 +178,6 @@
 
         // Sort the nodes.
         if (sort != null) root.sort(sort);
-
         // Compute the layout.
         const dx = 10;
         const dy = width / (root.height + padding);
@@ -174,7 +194,7 @@
         // Compute the default height.
         if (height === undefined) height = x1 - x0 + dx * 2;
 
-        const svg = d3.select("#viz").append("svg")
+        const svg = d3.select("#viz").select("svg")
             .attr("viewBox", [-dy * padding / 2, x0 - dx, width, height])
             .attr("width", width)
             .attr("height", height)
@@ -192,14 +212,18 @@
             .selectAll("path")
             .data(root.links())
             .join("path")
-                .attr("d", d3.linkHorizontal()
-                    .x(d => d.y)
-                    .y(d => d.x));
+            .classed("fakeRootElements", d => d.source.data.id == "0")
+            .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
+            .attr("d", d3.linkHorizontal()
+                .x(d => d.y)
+                .y(d => d.x));
 
         const node = svg.append("g")
             .selectAll("a")
             .data(root.descendants())
             .join("a")
+            .classed("fakeRootElements", d => d.data.id == "0")
+            .attr("id", d => "node" + d.data.id)
             .attr("xlink:href", link == null ? null : d => link(d.data, d))
             .attr("target", link == null ? null : linkTarget)
             .attr("transform", d => `translate(${d.y},${d.x})`);
@@ -207,6 +231,19 @@
         node.append("circle")
             .attr("fill", d => d.children ? stroke : fill)
             .attr("r", r);
+
+        let linksBetweenChildren = getLinksBetweenChildren(root.descendants());
+        svg.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "url(#grad1)")
+            .attr("stroke-opacity", strokeOpacity)
+            .attr("stroke-linecap", strokeLinecap)
+            .attr("stroke-linejoin", strokeLinejoin)
+            .attr("stroke-width", strokeWidth)
+            .selectAll("path")
+            .data(linksBetweenChildren)
+            .join("path")
+            .attr("d", drawArcBetweenSameLevel);
 
         if (title != null) node.append("title")
             .text(d => title(d.data, d));
@@ -220,5 +257,44 @@
             .attr("fill", "none")
             .attr("stroke", halo)
             .attr("stroke-width", haloWidth);
+    }
+    function getLinksBetweenChildren(nodeElems, includeAllLevels=false, includeDifferentParents=false) {
+        let links = [];
+        let nodeElemMap = {};   // build lookup map to easily access node element by id
+        nodeElems.forEach(function (node) {
+            nodeElemMap[node.data.id] = node;
+        });
+        nodeData.forEach(function (node) {
+            let nonDirectParents = node.parents.slice(1);   // get only the non-direct parents, which are the nodes after the first parent node
+            nonDirectParents.forEach(function (parentId) {
+                let parentNode = nodeLookup[parentId];
+                if (includeAllLevels || node.level == parentNode.level) { // if not including all levels, get only the links between children in the same level
+                    if (includeDifferentParents || node.directParent == parentNode.directParent) { // if not including nodes with different parents, get only the links between children under the same parent
+                        // this node follows the parent node, so set this node as source and parent node as target
+                        links.push({
+                            source: nodeElemMap[node.id],
+                            target: nodeElemMap[parentId]
+                        });
+                        if (nodeElemMap[parentId] == undefined) {
+                            console.log(nodeElemMap[node.id]);
+                            console.log(nodeLookup[parentId]);
+                        }
+                    }
+                }
+            })
+        });
+        return links;
+    }
+    function drawArcBetweenSameLevel(d) {
+        let start = d.source.x;    // X position of start node on the X axis
+        let end = d.target.x;      // X position of end node
+        let height = d.source.y; // this would be the same for the two points since they are in the same level
+        console.log(start, end, height)
+        return ['M', height, start,    // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
+            'A',                            // This means we're gonna build an elliptical arc
+            (start - end)/2, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
+            (start - end)/2, 0, 0, ',',
+            start < end ? 1 : 0, height, ',', end] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
+            .join(' ');
     }
 </script>
