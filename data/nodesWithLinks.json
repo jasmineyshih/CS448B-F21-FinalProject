@@ -4,19 +4,26 @@
         "timestamp": 1591108557,
         "numLikes": 2277,
         "numComments": 76,
-        "parents": [],
-        "children": [
+        "following": [
             "18918467",
             "259220806",
             "3255807"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "21388754496",
         "timestamp": 1591103722,
         "numLikes": 1870326,
         "numComments": 10438,
-        "parents": [
+        "following": [
+            "259220806",
+            "1809062259",
+            "666908117",
+            "3255807",
+            "18918467"
+        ],
+        "followers": [
             "240597150",
             "38682264",
             "1276021402",
@@ -26,13 +33,6 @@
             "6281714",
             "27467826",
             "18918467"
-        ],
-        "children": [
-            "259220806",
-            "1809062259",
-            "666908117",
-            "3255807",
-            "18918467"
         ]
     },
     {
@@ -40,15 +40,15 @@
         "timestamp": 1591085372,
         "numLikes": 144599,
         "numComments": 385,
-        "parents": [
-            "55119332",
-            "1457193",
-            "1110555291"
-        ],
-        "children": [
+        "following": [
             "504544916",
             "55119332",
             "259220806"
+        ],
+        "followers": [
+            "55119332",
+            "1457193",
+            "1110555291"
         ]
     },
     {
@@ -56,13 +56,13 @@
         "timestamp": 1591106967,
         "numLikes": 371,
         "numComments": 2,
-        "parents": [
-            "1457193"
-        ],
-        "children": [
+        "following": [
             "1457193",
             "186906058",
             "7210007"
+        ],
+        "followers": [
+            "1457193"
         ]
     },
     {
@@ -70,33 +70,33 @@
         "timestamp": 1591103735,
         "numLikes": 11613,
         "numComments": 62,
-        "parents": [],
-        "children": [
+        "following": [
             "21388754496"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "414829828",
         "timestamp": 1591116637,
         "numLikes": 154,
         "numComments": 0,
-        "parents": [
+        "following": [],
+        "followers": [
             "1484967048"
-        ],
-        "children": []
+        ]
     },
     {
         "id": "205729694",
         "timestamp": 1591102406,
         "numLikes": 17282,
         "numComments": 95,
-        "parents": [
-            "1457193",
-            "186906058"
-        ],
-        "children": [
+        "following": [
             "186906058",
             "195976455"
+        ],
+        "followers": [
+            "1457193",
+            "186906058"
         ]
     },
     {
@@ -104,32 +104,32 @@
         "timestamp": 1591094280,
         "numLikes": 650,
         "numComments": 6,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "15441868",
         "timestamp": 1591104448,
         "numLikes": 5528,
         "numComments": 20,
-        "parents": [
+        "following": [],
+        "followers": [
             "296410411"
-        ],
-        "children": []
+        ]
     },
     {
         "id": "52344520",
         "timestamp": 1591118677,
         "numLikes": 2977,
         "numComments": 52,
-        "parents": [
-            "1457193"
-        ],
-        "children": [
+        "following": [
             "18918467",
             "1457193",
             "7210007",
             "1418652011"
+        ],
+        "followers": [
+            "1457193"
         ]
     },
     {
@@ -137,54 +137,54 @@
         "timestamp": 1591121497,
         "numLikes": 26670,
         "numComments": 47,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "38682264",
         "timestamp": 1591108515,
         "numLikes": 31,
         "numComments": 0,
-        "parents": [],
-        "children": [
+        "following": [
             "21388754496",
             "1418652011",
             "1062460880",
             "1376116570"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "1276021402",
         "timestamp": 1591123010,
         "numLikes": 2,
         "numComments": 0,
-        "parents": [],
-        "children": [
+        "following": [
             "21388754496",
             "1062460880",
             "1809062259",
             "1376116570"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "3253959343",
         "timestamp": 1591110116,
         "numLikes": 65,
         "numComments": 0,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "201114982",
         "timestamp": 1591107058,
         "numLikes": 1603,
         "numComments": 28,
-        "parents": [
-            "195976455"
-        ],
-        "children": [
+        "following": [
             "195976455",
             "1418652011"
+        ],
+        "followers": [
+            "195976455"
         ]
     },
     {
@@ -192,42 +192,42 @@
         "timestamp": 1591108524,
         "numLikes": 7979,
         "numComments": 55,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "5562698337",
         "timestamp": 1591124930,
         "numLikes": 5105,
         "numComments": 55,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "6058462935",
         "timestamp": 1591124130,
         "numLikes": 10783,
         "numComments": 106,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "195976455",
         "timestamp": 1591113875,
         "numLikes": 96546,
         "numComments": 813,
-        "parents": [
+        "following": [
+            "3255807",
+            "1809062259",
+            "18918467",
+            "201114982"
+        ],
+        "followers": [
             "205729694",
             "201114982",
             "55119332",
             "1484967048",
             "338937684"
-        ],
-        "children": [
-            "3255807",
-            "1809062259",
-            "18918467",
-            "201114982"
         ]
     },
     {
@@ -235,18 +235,18 @@
         "timestamp": 1591117148,
         "numLikes": 5914,
         "numComments": 156,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "1592568560",
         "timestamp": 1591130043,
         "numLikes": 8,
         "numComments": 0,
-        "parents": [
+        "following": [
             "251181285"
         ],
-        "children": [
+        "followers": [
             "251181285"
         ]
     },
@@ -255,10 +255,10 @@
         "timestamp": 1591110516,
         "numLikes": 29,
         "numComments": 0,
-        "parents": [
+        "following": [
             "1592568560"
         ],
-        "children": [
+        "followers": [
             "1592568560"
         ]
     },
@@ -267,12 +267,12 @@
         "timestamp": 1591127258,
         "numLikes": 13953,
         "numComments": 103,
-        "parents": [
-            "27467826"
-        ],
-        "children": [
+        "following": [
             "259220806",
             "504544916",
+            "27467826"
+        ],
+        "followers": [
             "27467826"
         ]
     },
@@ -281,7 +281,12 @@
         "timestamp": 1591080182,
         "numLikes": 751760,
         "numComments": 4316,
-        "parents": [
+        "following": [
+            "21388754496",
+            "3255807",
+            "1418652011"
+        ],
+        "followers": [
             "21388754496",
             "1276021402",
             "195976455",
@@ -290,11 +295,6 @@
             "3255807",
             "11305924",
             "15745350"
-        ],
-        "children": [
-            "21388754496",
-            "3255807",
-            "1418652011"
         ]
     },
     {
@@ -302,15 +302,15 @@
         "timestamp": 1591100381,
         "numLikes": 351242,
         "numComments": 1046,
-        "parents": [
-            "21388754496",
-            "11305924",
-            "1376116570"
-        ],
-        "children": [
+        "following": [
             "21388754496",
             "11305924",
             "3255807"
+        ],
+        "followers": [
+            "21388754496",
+            "11305924",
+            "1376116570"
         ]
     },
     {
@@ -318,10 +318,7 @@
         "timestamp": 1591142411,
         "numLikes": 17631,
         "numComments": 142,
-        "parents": [
-            "2718680"
-        ],
-        "children": [
+        "following": [
             "195976455",
             "18918467",
             "1809062259",
@@ -329,6 +326,9 @@
             "2718680",
             "259220806",
             "14805456"
+        ],
+        "followers": [
+            "2718680"
         ]
     },
     {
@@ -336,14 +336,14 @@
         "timestamp": 1591110072,
         "numLikes": 43091,
         "numComments": 134,
-        "parents": [
+        "following": [
+            "259220806"
+        ],
+        "followers": [
             "2718680",
             "3247445400",
             "259220806",
             "27467826"
-        ],
-        "children": [
-            "259220806"
         ]
     },
     {
@@ -351,16 +351,16 @@
         "timestamp": 1591162306,
         "numLikes": 19,
         "numComments": 0,
-        "parents": [
-            "696773834",
-            "34974839"
-        ],
-        "children": [
+        "following": [
             "18918467",
             "1809062259",
             "34974839",
             "3255807",
             "1418652011"
+        ],
+        "followers": [
+            "696773834",
+            "34974839"
         ]
     },
     {
@@ -368,12 +368,7 @@
         "timestamp": 1591123132,
         "numLikes": 718,
         "numComments": 3,
-        "parents": [
-            "1882790",
-            "52344520",
-            "186906058"
-        ],
-        "children": [
+        "following": [
             "52344520",
             "2718680",
             "1882790",
@@ -386,6 +381,11 @@
             "27467826",
             "7210007",
             "205729694"
+        ],
+        "followers": [
+            "1882790",
+            "52344520",
+            "186906058"
         ]
     },
     {
@@ -393,19 +393,19 @@
         "timestamp": 1591105909,
         "numLikes": 4599,
         "numComments": 29,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "205968744",
         "timestamp": 1591114522,
         "numLikes": 5979,
         "numComments": 45,
-        "parents": [
-            "1457193",
+        "following": [
             "1098254436"
         ],
-        "children": [
+        "followers": [
+            "1457193",
             "1098254436"
         ]
     },
@@ -414,18 +414,25 @@
         "timestamp": 1591102309,
         "numLikes": 1467,
         "numComments": 14,
-        "parents": [],
-        "children": [
+        "following": [
             "7210007",
             "15441868"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "3255807",
         "timestamp": 1591077990,
         "numLikes": 384118,
         "numComments": 667,
-        "parents": [
+        "following": [
+            "21388754496",
+            "1809062259",
+            "18918467",
+            "6281714",
+            "11305924"
+        ],
+        "followers": [
             "1171079061",
             "21388754496",
             "195976455",
@@ -436,13 +443,6 @@
             "6281714",
             "226440342",
             "27467826"
-        ],
-        "children": [
-            "21388754496",
-            "1809062259",
-            "18918467",
-            "6281714",
-            "11305924"
         ]
     },
     {
@@ -450,7 +450,10 @@
         "timestamp": 1591103005,
         "numLikes": 411752,
         "numComments": 1292,
-        "parents": [
+        "following": [
+            "504544916"
+        ],
+        "followers": [
             "1171079061",
             "21388754496",
             "2718680",
@@ -462,9 +465,6 @@
             "1110555291",
             "186906058",
             "27467826"
-        ],
-        "children": [
-            "504544916"
         ]
     },
     {
@@ -472,16 +472,16 @@
         "timestamp": 1591132263,
         "numLikes": 83047,
         "numComments": 221,
-        "parents": [
+        "following": [
+            "18918467"
+        ],
+        "followers": [
             "1882790",
             "52344520",
             "1457193",
             "296410411",
             "11305924",
             "1484967048"
-        ],
-        "children": [
-            "18918467"
         ]
     },
     {
@@ -489,23 +489,23 @@
         "timestamp": 1591078354,
         "numLikes": 118,
         "numComments": 0,
-        "parents": [],
-        "children": [
+        "following": [
             "1540555408"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "1098254436",
         "timestamp": 1591116352,
         "numLikes": 11600,
         "numComments": 117,
-        "parents": [
+        "following": [
+            "205968744"
+        ],
+        "followers": [
             "1457193",
             "205968744",
             "11305924"
-        ],
-        "children": [
-            "205968744"
         ]
     },
     {
@@ -513,20 +513,15 @@
         "timestamp": 1591121234,
         "numLikes": 183,
         "numComments": 0,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "11305924",
         "timestamp": 1591120114,
         "numLikes": 147523,
         "numComments": 496,
-        "parents": [
-            "666908117",
-            "3255807",
-            "6281714"
-        ],
-        "children": [
+        "following": [
             "1809062259",
             "7210007",
             "1098254436",
@@ -534,6 +529,11 @@
             "666908117",
             "18918467",
             "3255807"
+        ],
+        "followers": [
+            "666908117",
+            "3255807",
+            "6281714"
         ]
     },
     {
@@ -541,15 +541,15 @@
         "timestamp": 1591075847,
         "numLikes": 341206,
         "numComments": 1977,
-        "parents": [
+        "following": [
+            "53359"
+        ],
+        "followers": [
             "55119332",
             "53359",
             "6281714",
             "999628",
             "27467826"
-        ],
-        "children": [
-            "53359"
         ]
     },
     {
@@ -557,15 +557,15 @@
         "timestamp": 1591059162,
         "numLikes": 7643,
         "numComments": 158,
-        "parents": [
+        "following": [
+            "18918467",
+            "14805456"
+        ],
+        "followers": [
             "14805456",
             "35843209",
             "999628",
             "18918467"
-        ],
-        "children": [
-            "18918467",
-            "14805456"
         ]
     },
     {
@@ -573,26 +573,27 @@
         "timestamp": 1591119017,
         "numLikes": 1704,
         "numComments": 7,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "1110555291",
         "timestamp": 1591117303,
         "numLikes": 1935,
         "numComments": 6,
-        "parents": [],
-        "children": [
+        "following": [
             "2718680",
             "259220806"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "1418652011",
         "timestamp": 1591087758,
         "numLikes": 1742268,
         "numComments": 8573,
-        "parents": [
+        "following": [],
+        "followers": [
             "52344520",
             "38682264",
             "201114982",
@@ -601,38 +602,37 @@
             "900616511",
             "226440342",
             "15745350"
-        ],
-        "children": []
+        ]
     },
     {
         "id": "14186520112",
         "timestamp": 1591121316,
         "numLikes": 19790,
         "numComments": 91,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "14186520113",
         "timestamp": 1591121299,
         "numLikes": 15763,
         "numComments": 32,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "6281714",
         "timestamp": 1591093866,
         "numLikes": 26604,
         "numComments": 370,
-        "parents": [
-            "1457193",
-            "3255807"
-        ],
-        "children": [
+        "following": [
             "14805456",
             "21388754496",
             "11305924",
+            "3255807"
+        ],
+        "followers": [
+            "1457193",
             "3255807"
         ]
     },
@@ -641,12 +641,12 @@
         "timestamp": 1591110564,
         "numLikes": 1225,
         "numComments": 0,
-        "parents": [
-            "999628"
-        ],
-        "children": [
+        "following": [
             "999628",
             "53359"
+        ],
+        "followers": [
+            "999628"
         ]
     },
     {
@@ -654,13 +654,13 @@
         "timestamp": 1591131830,
         "numLikes": 482,
         "numComments": 3,
-        "parents": [
-            "35843209"
-        ],
-        "children": [
+        "following": [
             "53359",
             "35843209",
             "14805456"
+        ],
+        "followers": [
+            "35843209"
         ]
     },
     {
@@ -668,24 +668,24 @@
         "timestamp": 1591106538,
         "numLikes": 2548,
         "numComments": 11,
-        "parents": [
+        "following": [],
+        "followers": [
             "3426527001"
-        ],
-        "children": []
+        ]
     },
     {
         "id": "186906058",
         "timestamp": 1591083045,
         "numLikes": 1421,
         "numComments": 9,
-        "parents": [
-            "1882790",
-            "205729694"
-        ],
-        "children": [
+        "following": [
             "259220806",
             "205729694",
             "1457193"
+        ],
+        "followers": [
+            "1882790",
+            "205729694"
         ]
     },
     {
@@ -693,20 +693,20 @@
         "timestamp": 1591086570,
         "numLikes": 36,
         "numComments": 1,
-        "parents": [],
-        "children": [
+        "following": [
             "900616511"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "34974839",
         "timestamp": 1591094289,
         "numLikes": 26,
         "numComments": 0,
-        "parents": [
+        "following": [
             "900616511"
         ],
-        "children": [
+        "followers": [
             "900616511"
         ]
     },
@@ -715,38 +715,38 @@
         "timestamp": 1591116959,
         "numLikes": 15,
         "numComments": 0,
-        "parents": [],
-        "children": [
+        "following": [
             "7210007",
             "414829828",
             "18918467",
             "195976455"
-        ]
+        ],
+        "followers": []
     },
     {
         "id": "1830316727",
         "timestamp": 1591121090,
         "numLikes": 16,
         "numComments": 0,
-        "parents": [],
-        "children": []
+        "following": [],
+        "followers": []
     },
     {
         "id": "226440342",
         "timestamp": 1591129084,
         "numLikes": 47,
         "numComments": 0,
-        "parents": [
-            "398465277",
-            "15745350",
-            "578620938"
-        ],
-        "children": [
+        "following": [
             "1418652011",
             "3255807",
             "338937684",
             "15745350",
             "398465277"
+        ],
+        "followers": [
+            "398465277",
+            "15745350",
+            "578620938"
         ]
     },
     {
@@ -754,12 +754,12 @@
         "timestamp": 1591120577,
         "numLikes": 55712,
         "numComments": 256,
-        "parents": [
-            "38682264",
-            "1276021402",
+        "following": [
             "1376116570"
         ],
-        "children": [
+        "followers": [
+            "38682264",
+            "1276021402",
             "1376116570"
         ]
     },
@@ -768,18 +768,18 @@
         "timestamp": 1591102582,
         "numLikes": 157405,
         "numComments": 588,
-        "parents": [
+        "following": [
+            "666908117",
+            "18918467",
+            "1062460880"
+        ],
+        "followers": [
             "38682264",
             "1276021402",
             "1457193",
             "1062460880",
             "15745350",
             "18918467"
-        ],
-        "children": [
-            "666908117",
-            "18918467",
-            "1062460880"
         ]
     },
     {
@@ -787,17 +787,17 @@
         "timestamp": 1591108553,
         "numLikes": 64,
         "numComments": 0,
-        "parents": [
-            "226440342",
-            "15745350",
-            "578620938",
-            "338937684"
-        ],
-        "children": [
+        "following": [
             "578620938",
             "226440342",
             "338937684",
             "15745350"
+        ],
+        "followers": [
+            "226440342",
+            "15745350",
+            "578620938",
+            "338937684"
         ]
     },
     {
@@ -805,19 +805,19 @@
         "timestamp": 1591119636,
         "numLikes": 22,
         "numComments": 0,
-        "parents": [
-            "226440342",
-            "398465277",
-            "578620938",
-            "338937684"
-        ],
-        "children": [
+        "following": [
             "1418652011",
             "1809062259",
             "1376116570",
             "226440342",
             "578620938",
             "398465277",
+            "338937684"
+        ],
+        "followers": [
+            "226440342",
+            "398465277",
+            "578620938",
             "338937684"
         ]
     },
@@ -826,11 +826,7 @@
         "timestamp": 1591108560,
         "numLikes": 36423,
         "numComments": 264,
-        "parents": [
-            "3247445400",
-            "1457193"
-        ],
-        "children": [
+        "following": [
             "21388754496",
             "3255807",
             "14805456",
@@ -838,6 +834,10 @@
             "259220806",
             "3247445400",
             "18918467"
+        ],
+        "followers": [
+            "3247445400",
+            "1457193"
         ]
     },
     {
@@ -845,7 +845,12 @@
         "timestamp": 1591108517,
         "numLikes": 903508,
         "numComments": 4954,
-        "parents": [
+        "following": [
+            "21388754496",
+            "53359",
+            "1376116570"
+        ],
+        "followers": [
             "1171079061",
             "21388754496",
             "52344520",
@@ -860,11 +865,6 @@
             "1484967048",
             "1376116570",
             "27467826"
-        ],
-        "children": [
-            "21388754496",
-            "53359",
-            "1376116570"
         ]
     },
     {
@@ -872,16 +872,16 @@
         "timestamp": 1591113620,
         "numLikes": 62,
         "numComments": 0,
-        "parents": [
-            "398465277",
-            "15745350",
-            "338937684"
-        ],
-        "children": [
+        "following": [
             "226440342",
             "398465277",
             "338937684",
             "15745350"
+        ],
+        "followers": [
+            "398465277",
+            "15745350",
+            "338937684"
         ]
     },
     {
@@ -889,17 +889,17 @@
         "timestamp": 1591108898,
         "numLikes": 60,
         "numComments": 0,
-        "parents": [
-            "226440342",
-            "398465277",
-            "15745350",
-            "578620938"
-        ],
-        "children": [
+        "following": [
             "195976455",
             "578620938",
             "398465277",
             "15745350"
+        ],
+        "followers": [
+            "226440342",
+            "398465277",
+            "15745350",
+            "578620938"
         ]
     }
 ]

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="viz"></div>
+
+<script>
+    var nodeData;   // list of nodes
+    var nodeLookup = {};    // maps node id to node object for easy lookup
+    d3.json("data/nodesWithLinks.json").then(function(data) {
+        nodeData = data;
+        nodeData.forEach(function (nodeObj) {
+            nodeLookup[nodeObj.id] = nodeObj;
+        });
+        sortListsAndHandleCycles();
+        computeAndAddNodeLevels();
+        console.log(nodeData);
+    });
+    function sortListsAndHandleCycles() {   // if two nodes follow each other, we break the cycle by only keeping the edge that goes from the earlier post to later post
+        nodeData.forEach(function (nodeObj) {
+            nodeObj.following.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp);  // sort this node's parent node ids in order of increasing timestamp
+            nodeObj.followers.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp); // sort this node's child node ids in order of increasing timestamp
+            nodeObj.followers.forEach(function (childId) {
+                if (nodeObj.following.includes(childId)) {    // this would be true if two nodes connect to each other
+                    let childObj = nodeLookup[childId];
+                    if (nodeObj.timestamp < childObj.timestamp) {   // this node posted earlier than the other node, keep this node as parent
+                        nodeObj.following.splice(nodeObj.following.indexOf(childId), 1);
+                        childObj.followers.splice(childObj.followers.indexOf(nodeObj.id), 1);
+                        childObj.omittedFollowers = childObj.omittedFollowers ? childObj.omittedFollowers : [];
+                        childObj.omittedFollowers.push(nodeObj.id);
+                    } else if (childObj.timestamp < nodeObj.timestamp) {    // other node posted earlier than this node, make this node child
+                        childObj.following.splice(childObj.following.indexOf(nodeObj.id), 1);
+                        nodeObj.followers.splice(nodeObj.followers.indexOf(childId), 1);
+                        nodeObj.omittedFollowers = nodeObj.omittedFollowers ? nodeObj.omittedFollowers : [];
+                        nodeObj.omittedFollowers.push(childId);
+                    } else {
+                        console.log("Two nodes that follow each other have the same exact timestamp! This is basically impossible!")
+                    }
+                }
+            })
+        });
+    }
+
+    function computeAndAddNodeLevels() {
+        let level0Nodes = [];   // level 0 nodes are nodes without parents, meaning they were not influenced by others before them
+        nodeData.forEach(function (nodeObj) {
+            // TODO: figure out what to do with "loner" nodes - nodes with no parents and no children
+            if (nodeObj.following.length == 0 && nodeObj.followers.length > 0) {   // for now, filter out the nodes that have neighter parents nor children
+                level0Nodes.push(nodeObj);
+                nodeObj.level = 0;
+            }
+        });
+        level0Nodes.sort((a, b) => a.timestamp - b.timestamp);
+        let currLevelNodes = level0Nodes;
+        let currNode = currLevelNodes.shift();
+        while (currNode) {
+            let currNodeLevel = currNode.level;
+            let childrenNodesIds = currNode.followers;
+            childrenNodesIds.forEach(function(id) {
+                let childNodeObj = nodeLookup[id];
+                if (childNodeObj.level == undefined) {
+                    childNodeObj.level = currNodeLevel + 1;
+                    childNodeObj.directParent = currNode;
+                    currLevelNodes.push(childNodeObj);
+                }
+            });
+            currNode = currLevelNodes.shift();
+        }
+    }
+</script>
