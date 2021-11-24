@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="viz"></div>
+
+<script>
+    var nodeData;   // list of nodes
+    var linkData;   // list of links
+    var nodeLookup = {};    // maps node id to node object for easy lookup
+    d3.json("data/nodesAndLinks.json").then(function(data) {
+        nodeData = data.nodes;
+        linkData = data.links;
+        nodeData.forEach(function (nodeObj) {
+            nodeObj.parents = [];
+            nodeObj.children = [];
+            nodeObj.otherFollowers = [];
+            nodeObj.otherFollowing = [];
+            nodeLookup[nodeObj.id] = nodeObj;
+        });
+        preprocessData();   // transform data into the format we want
+        console.log(nodeData);
+    });
+    function preprocessData() {
+        linkData.forEach(function (link) {
+            let sourceNode = nodeLookup[link.source];   // the source node represents the user that follows the target user
+            let targetNode = nodeLookup[link.target];   // the target node represents the user that is followed the source user
+            if (sourceNode.timestamp > targetNode.timestamp) {
+                // store the target node id as a parent of the source node only if the target node has an earlier timestamp
+                sourceNode.parents.push(targetNode.id);
+                targetNode.children.push(sourceNode.id);
+            } else {
+                // otherwise still keep it, as it could be useful later
+                sourceNode.otherFollowing.push(targetNode.id);
+                targetNode.otherFollowers.push(sourceNode.id);
+            }
+        });
+        nodeData.forEach(function (node) {
+            node.parents.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp);
+            node.children.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp);
+            node.directParent = node.parents.length > 0 ? node.parents[0] : null;    // the direct parent of the node is the node among the parents that has the earliest timestamp
+        });
+        computeAndAddNodeLevel();
+    }
+    function computeAndAddNodeLevel() {
+        let level0Nodes = [];
+        nodeData.forEach(function (nodeObj) {
+            // TODO: figure out what to do with "loner" nodes - nodes with no parents and no children
+            if (nodeObj.parents.length == 0) {
+                level0Nodes.push(nodeObj);
+                nodeObj.level = 0;
+            }
+        });
+        let currLevelNodes = level0Nodes;
+        let currNode = currLevelNodes.shift();
+        while (currNode) {
+            let currNodeLevel = currNode.level;
+            let childrenNodesIds = currNode.children;
+            childrenNodesIds.forEach(function(id) {
+                let childNodeObj = nodeLookup[id];
+                if (childNodeObj.directParent == currNode.id && childNodeObj.level == undefined) {
+                    childNodeObj.level = currNodeLevel + 1;
+                    currLevelNodes.push(childNodeObj);
+                }
+            });
+            currNode = currLevelNodes.shift();
+        }
+    }
+</script>
