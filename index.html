@@ -14,9 +14,21 @@
 <div id="viz">
     <svg>
         <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
                 <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
             </linearGradient>
         </defs>
     </svg>
@@ -33,63 +45,85 @@
         nodeData = data.nodes;
         linkData = data.links;
         nodeData.forEach(function (nodeObj) {
+            nodeObj.directParent = null;
             nodeObj.parents = [];
             nodeObj.allChildren = [];
+            nodeObj.children = [];
             nodeObj.otherFollowers = [];
             nodeObj.otherFollowing = [];
+            nodeObj.level = -1;
             nodeLookup[nodeObj.id] = nodeObj;
         });
         preprocessData();   // transform data into the format we want
+        console.log(nodeData);
         rootNode = transformToNested();
         Tree(rootNode, {
-            label: d => d.timestamp,
+            label: d => d.id,
             width: 1000
         });
     });
     function preprocessData() {
-        linkData.forEach(function (link) {
-            let sourceNode = nodeLookup[link.source];   // the source node represents the user that follows the target user
-            let targetNode = nodeLookup[link.target];   // the target node represents the user that is followed the source user
-            if (sourceNode.timestamp > targetNode.timestamp) {
-                // store the target node id as a parent of the source node only if the target node has an earlier timestamp
+        nodeData.sort((a, b) => a.timestamp - b.timestamp);
+        let nodeDataMap = new Map();
+        let children = new Map();
+        let parents = new Map();
+
+        nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
+        linkData.forEach(link => {
+            let sourceNode = nodeDataMap.get(link.source)
+            let targetNode = nodeDataMap.get(link.target)
+            if (sourceNode.timestamp > targetNode.timestamp){
                 sourceNode.parents.push(targetNode.id);
                 targetNode.allChildren.push(sourceNode.id);
-            } else {
-                // otherwise still keep it, as it could be useful later
-                sourceNode.otherFollowing.push(targetNode.id);
-                targetNode.otherFollowers.push(sourceNode.id);
+                nodeDataMap.set(link.source, sourceNode);
+                nodeDataMap.set(link.target, targetNode);
             }
         });
-        nodeData.forEach(function (node) {
-            node.parents.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp);
-            node.allChildren.sort((a, b) => nodeLookup[a].timestamp - nodeLookup[b].timestamp);
-            node.directParent = node.parents.length > 0 ? node.parents[0] : null;    // the direct parent of the node is the node among the parents that has the earliest timestamp
-        });
-        computeAndAddNodeLevel();
+
+        levelize(nodeDataMap);
+        setDirectParentChildren(nodeDataMap);
+        sortChildren(nodeDataMap);
     }
-    function computeAndAddNodeLevel() {
-        let level0Nodes = [];
-        nodeData.forEach(function (nodeObj) {
-            // TODO: figure out what to do with "loner" nodes - nodes with no parents and no children
-            if (nodeObj.parents.length == 0) {
-                level0Nodes.push(nodeObj);
-                nodeObj.level = 0;
+    function levelize(nodeMap){
+        nodeMap.forEach((node, id, map) => {
+            if (node.level === -1){
+                let currQueue = [id]
+                let currLevel = 0
+                while (currQueue.length > 0){    
+                    let numCurrLevelNodes = currQueue.length
+                    let count = 0;
+                    while (count < numCurrLevelNodes){
+                        let currId = currQueue.shift()
+                        let currNode = nodeMap.get(currId)
+                        let children = currNode.allChildren
+                        currQueue = currQueue.concat(children)
+                        if(currNode.level <= 0 || currNode.level > currLevel){
+                            currNode.level = currLevel
+                        }
+                        count++
+                    }
+                    currLevel++
+                }
             }
         });
-        let currLevelNodes = level0Nodes;
-        let currNode = currLevelNodes.shift();
-        while (currNode) {
-            let currNodeLevel = currNode.level;
-            let childrenNodesIds = currNode.allChildren;
-            childrenNodesIds.forEach(function(id) {
-                let childNodeObj = nodeLookup[id];
-                if (childNodeObj.directParent == currNode.id && childNodeObj.level == undefined) {
-                    childNodeObj.level = currNodeLevel + 1;
-                    currLevelNodes.push(childNodeObj);
+    }
+    function setDirectParentChildren(nodeMap){
+        nodeMap.forEach((node, id, map)=>{
+            node.parents.sort((node1, node2) => nodeMap.get(node1).timestamp - nodeMap.get(node2).timestamp);
+            node.parents.forEach(parentNodeId =>{
+                let parentNode = nodeMap.get(parentNodeId)
+                if (node.directParent == null && parentNode.level === node.level-1){
+                    node.directParent = parentNodeId;
+                    parentNode.children.push(id)
                 }
-            });
-            currNode = currLevelNodes.shift();
-        }
+            })
+        })
+    }
+    function sortChildren(nodeMap){
+        nodeMap.forEach((node, id, map)=>{
+            node.children.sort((child1, child2)=>nodeMap.get(child1).timestamp - nodeMap.get(child2).timestamp)
+            node.allChildren.sort((child1, child2)=>nodeMap.get(child1).timestamp - nodeMap.get(child2).timestamp)
+        })
     }
     function transformToNested() {
         nodeData.forEach(function (node) {
@@ -215,8 +249,8 @@
             .classed("fakeRootElements", d => d.source.data.id == "0")
             .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
             .attr("d", d3.linkHorizontal()
-                .x(d => d.y)
-                .y(d => d.x));
+            .x(d => d.y)
+            .y(d => d.x));
 
         const node = svg.append("g")
             .selectAll("a")
@@ -232,18 +266,18 @@
             .attr("fill", d => d.children ? stroke : fill)
             .attr("r", r);
 
-        let linksBetweenChildren = getLinksBetweenChildren(root.descendants());
+        let extraLinksBetweenNodes = getLinksBetweenNodes(root.descendants(), true, true);
         svg.append("g")
             .attr("fill", "none")
-            .attr("stroke", "url(#grad1)")
             .attr("stroke-opacity", strokeOpacity)
             .attr("stroke-linecap", strokeLinecap)
             .attr("stroke-linejoin", strokeLinejoin)
             .attr("stroke-width", strokeWidth)
             .selectAll("path")
-            .data(linksBetweenChildren)
+            .data(extraLinksBetweenNodes)
             .join("path")
-            .attr("d", drawArcBetweenSameLevel);
+            .attr("stroke", getGradientForLink)
+            .attr("d", drawPathBetweenNodes);
 
         if (title != null) node.append("title")
             .text(d => title(d.data, d));
@@ -258,14 +292,14 @@
             .attr("stroke", halo)
             .attr("stroke-width", haloWidth);
     }
-    function getLinksBetweenChildren(nodeElems, includeAllLevels=false, includeDifferentParents=false) {
+    function getLinksBetweenNodes(nodeElems, includeAllLevels=false, includeDifferentParents=false) {
         let links = [];
         let nodeElemMap = {};   // build lookup map to easily access node element by id
         nodeElems.forEach(function (node) {
             nodeElemMap[node.data.id] = node;
         });
         nodeData.forEach(function (node) {
-            let nonDirectParents = node.parents.slice(1);   // get only the non-direct parents, which are the nodes after the first parent node
+            let nonDirectParents = node.parents.filter(nId => nId != node.directParent);   // get only the non-direct parents, which are the nodes after the first parent node
             nonDirectParents.forEach(function (parentId) {
                 let parentNode = nodeLookup[parentId];
                 if (includeAllLevels || node.level == parentNode.level) { // if not including all levels, get only the links between children in the same level
@@ -275,21 +309,47 @@
                             source: nodeElemMap[node.id],
                             target: nodeElemMap[parentId]
                         });
-                        if (nodeElemMap[parentId] == undefined) {
-                            console.log(nodeElemMap[node.id]);
-                            console.log(nodeLookup[parentId]);
-                        }
                     }
                 }
             })
         });
         return links;
     }
+    /*function computePathCommands(d) {
+        let getPath = d3.linkHorizontal()
+            .x(d => d.y)
+            .y(d => d.x);
+        let pathString = getPath(d).split(",");
+        return funct;
+    }*/
+    function getGradientForLink(d) {
+        if (d.source.data.level == d.target.data.level) {  // drawing an arc since nodes are on the same level
+            if (d.source.x > d.target.x) {  // the arc goes from follower to followed node downward
+                return "url(#verticalGradFollowedUp)";
+            } else {    // otherwise the arc goes from follower to followed node upward
+                return "url(#verticalGradFollowerUp)";
+            }
+        } else {    // drawing an edge between different levels
+            if (d.source.data.level < d.target.data.level) {   // the edge goes from an earlier level to later level
+                return "url(#horizontalGradFollowerLeft)";
+            } else {    // otherwise the edge goes from a later level to earlier level
+                return "url(#horizontalGradFollowedLeft)";
+            }
+        }
+    }
+    function drawPathBetweenNodes(d) {
+        if (d.source.data.level == d.target.data.level) { 
+            return drawArcBetweenSameLevel(d);
+        }
+        let edgeFunct = d3.linkHorizontal()
+            .x(dt => dt.y)
+            .y(dt => dt.x);
+        return edgeFunct(d);
+    }
     function drawArcBetweenSameLevel(d) {
         let start = d.source.x;    // X position of start node on the X axis
         let end = d.target.x;      // X position of end node
         let height = d.source.y; // this would be the same for the two points since they are in the same level
-        console.log(start, end, height)
         return ['M', height, start,    // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
             'A',                            // This means we're gonna build an elliptical arc
             (start - end)/2, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
