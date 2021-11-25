@@ -66,10 +66,3 @@ function drawEdges(){
 }
 
 console.log(childNodes)
-
-let line = d3.line().curve(d3.curveBasis)
-let l = [[250,120],[280, 120], [250, 350],[230, 181],[250,12]]
-svg.append("path")
-            .attr("d", line(l))
-            .attr("fill", "none")
-            .attr("stroke", "blue");
