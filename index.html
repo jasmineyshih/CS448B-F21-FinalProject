@@ -50,23 +50,23 @@
 <div id="viz">
     <div id="tooltip">
         <div class="attributeContainer">
-            <div class="attributeLabel">Node ID</div>
+            <div class="attributeLabel">Node ID:</div>
             <div class="attributeValue" id="idField">###</div>
         </div>
         <div class="attributeContainer">
-            <div class="attributeLabel">Timestamp</div>
+            <div class="attributeLabel">Timestamp:</div>
             <div class="attributeValue" id="timestampField">###</div>
         </div>
         <div class="attributeContainer">
-            <div class="attributeLabel">Number of Likes</div>
+            <div class="attributeLabel">Number of Likes:</div>
             <div class="attributeValue" id="numLikesField">###</div>
         </div>
         <div class="attributeContainer">
-            <div class="attributeLabel">Number of Comments</div>
+            <div class="attributeLabel">Number of Comments:</div>
             <div class="attributeValue" id="numCommentsField">###</div>
         </div>
         <div class="attributeContainer">
-            <div class="attributeLabel">Degree of Contribution</div>
+            <div class="attributeLabel">Degree of Contribution:</div>
             <div class="attributeValue" id="degContributionField">###</div>
         </div>
     </div>
@@ -116,7 +116,7 @@
         console.log(nodeData);
         fakeRoot = transformToNested(nodeData);
         Tree(fakeRoot, {
-            label: d => d.id,
+            /*label: d => d.id,*/
             width: 1000
         });
     });
@@ -373,6 +373,9 @@
             }
             selectedNode = newSelectedNode;
         }
-        // TODO: update values shown in the tooltip with the new selected node info
+        d3.select("#idField").html(d.data.id);
+        d3.select("#timestampField").html(d.data.timestamp);
+        d3.select("#numLikesField").html(d.data.numLikes);
+        d3.select("#numCommentsField").html(d.data.numComments);
     }
 </script>
