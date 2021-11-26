@@ -3,6 +3,7 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
+<script src="scripts/preprocess.js"></script>
 
 <style>
     .fakeRootElements {
@@ -10,6 +11,14 @@
     }
 </style>
 
+<div>
+    <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
+    <label for="treeEdgeColoring">Use divergent coloring on tree edges</label>
+    <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
+    <label for="extraEdgeAcrossColoring">Use divergent coloring on extra edges within level</label>
+    <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
+    <label for="extraEdgeAcrossColoring">Use divergent coloring on extra edges across levels</label>
+</div>
 <!-- Create a div where the graph will take place -->
 <div id="viz">
     <svg>
@@ -35,6 +44,15 @@
 </div>
 
 <script>
+    /* UI variables */
+    var useGradientOnTreeEdges = true;
+    var useGradientOnExtraEdgesWithin = true;
+    var useGradientOnExtraEdgesAcross = true;
+
+    /* svg variables */
+    var svg = d3.select("#viz").select("svg");
+    var solidEdgeColor = "#555";
+
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
     var linkData;   // list of links
@@ -44,110 +62,14 @@
     d3.json("data/nodesAndLinks.json").then(function(data) {
         nodeData = data.nodes;
         linkData = data.links;
-        nodeData.forEach(function (nodeObj) {
-            nodeObj.directParent = null;
-            nodeObj.parents = [];
-            nodeObj.allChildren = [];
-            nodeObj.children = [];
-            nodeObj.otherFollowers = [];
-            nodeObj.otherFollowing = [];
-            nodeObj.level = -1;
-            nodeLookup[nodeObj.id] = nodeObj;
-        });
-        preprocessData();   // transform data into the format we want
+        preprocessData(nodeData, linkData, nodeLookup);   // transform data into the format we want
         console.log(nodeData);
-        rootNode = transformToNested();
-        Tree(rootNode, {
+        fakeRoot = transformToNested(nodeData);
+        Tree(fakeRoot, {
             label: d => d.id,
             width: 1000
         });
     });
-    function preprocessData() {
-        nodeData.sort((a, b) => a.timestamp - b.timestamp);
-        let nodeDataMap = new Map();
-        let children = new Map();
-        let parents = new Map();
-
-        nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
-        linkData.forEach(link => {
-            let sourceNode = nodeDataMap.get(link.source)
-            let targetNode = nodeDataMap.get(link.target)
-            if (sourceNode.timestamp > targetNode.timestamp){
-                sourceNode.parents.push(targetNode.id);
-                targetNode.allChildren.push(sourceNode.id);
-                nodeDataMap.set(link.source, sourceNode);
-                nodeDataMap.set(link.target, targetNode);
-            }
-        });
-
-        levelize(nodeDataMap);
-        setDirectParentChildren(nodeDataMap);
-        sortChildren(nodeDataMap);
-    }
-    function levelize(nodeMap){
-        nodeMap.forEach((node, id, map) => {
-            if (node.level === -1){
-                let currQueue = [id]
-                let currLevel = 0
-                while (currQueue.length > 0){    
-                    let numCurrLevelNodes = currQueue.length
-                    let count = 0;
-                    while (count < numCurrLevelNodes){
-                        let currId = currQueue.shift()
-                        let currNode = nodeMap.get(currId)
-                        let children = currNode.allChildren
-                        currQueue = currQueue.concat(children)
-                        if(currNode.level <= 0 || currNode.level > currLevel){
-                            currNode.level = currLevel
-                        }
-                        count++
-                    }
-                    currLevel++
-                }
-            }
-        });
-    }
-    function setDirectParentChildren(nodeMap){
-        nodeMap.forEach((node, id, map)=>{
-            node.parents.sort((node1, node2) => nodeMap.get(node1).timestamp - nodeMap.get(node2).timestamp);
-            node.parents.forEach(parentNodeId =>{
-                let parentNode = nodeMap.get(parentNodeId)
-                if (node.directParent == null && parentNode.level === node.level-1){
-                    node.directParent = parentNodeId;
-                    parentNode.children.push(id)
-                }
-            })
-        })
-    }
-    function sortChildren(nodeMap){
-        nodeMap.forEach((node, id, map)=>{
-            node.children.sort((child1, child2)=>nodeMap.get(child1).timestamp - nodeMap.get(child2).timestamp)
-            node.allChildren.sort((child1, child2)=>nodeMap.get(child1).timestamp - nodeMap.get(child2).timestamp)
-        })
-    }
-    function transformToNested() {
-        nodeData.forEach(function (node) {
-            node.children = [];
-            node.allChildren.forEach(function (childId) {
-                let childNode = nodeLookup[childId];
-                if (childNode.directParent == node.id) {
-                    node.children.push(childNode);
-                }
-            });
-        });
-        let fakeRootNode = {
-            id: "0",
-            children: []
-        };
-        for (let i = 0; i < nodeData.length; i++) {
-            if (nodeData[i].directParent == null /*&& nodeData[i].children.length > 0*/) {
-                fakeRootNode.children.push(nodeData[i]);
-            }
-        }
-        fakeRootNode.children.sort((a, b) => a.timestamp - b.timestamp);
-        return fakeRootNode;
-    }
-    /* end of data loading and preprocessing */
 
     // Copyright 2021 Observable, Inc.
     // Released under the ISC license.
@@ -165,7 +87,7 @@
         linkTarget = "_blank", // the target attribute for links (if any)
         width = 640, // outer width, in pixels
         height, // outer height, in pixels
-        r = 3, // radius of nodes
+        r = 4, // radius of nodes
         padding = 1, // horizontal padding for first and last column
         fill = "#999", // fill for nodes
         fillOpacity, // fill opacity for nodes
@@ -228,8 +150,7 @@
         // Compute the default height.
         if (height === undefined) height = x1 - x0 + dx * 2;
 
-        const svg = d3.select("#viz").select("svg")
-            .attr("viewBox", [-dy * padding / 2, x0 - dx, width, height])
+        svg.attr("viewBox", [-dy * padding / 2, x0 - dx, width, height])
             .attr("width", width)
             .attr("height", height)
             .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
@@ -238,7 +159,6 @@
 
         svg.append("g")
             .attr("fill", "none")
-            .attr("stroke", stroke)
             .attr("stroke-opacity", strokeOpacity)
             .attr("stroke-linecap", strokeLinecap)
             .attr("stroke-linejoin", strokeLinejoin)
@@ -247,10 +167,10 @@
             .data(root.links())
             .join("path")
             .classed("fakeRootElements", d => d.source.data.id == "0")
+            .classed("treeEdges", true)
+            .attr("stroke", getGradientForTreeLink)
             .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
-            .attr("d", d3.linkHorizontal()
-            .x(d => d.y)
-            .y(d => d.x));
+            .attr("d", computePathCommands);
 
         const node = svg.append("g")
             .selectAll("a")
@@ -276,6 +196,9 @@
             .selectAll("path")
             .data(extraLinksBetweenNodes)
             .join("path")
+            .classed("extraEdgesBetweenNodes", true)
+            .classed("extraEdgesAcrossLevels", d => !d.sameLevel)
+            .classed("extraEdgesWithinLevels", d => d.sameLevel)
             .attr("stroke", getGradientForLink)
             .attr("d", drawPathBetweenNodes);
 
@@ -307,7 +230,8 @@
                         // this node follows the parent node, so set this node as source and parent node as target
                         links.push({
                             source: nodeElemMap[node.id],
-                            target: nodeElemMap[parentId]
+                            target: nodeElemMap[parentId],
+                            sameLevel: node.level == parentNode.level
                         });
                     }
                 }
@@ -315,21 +239,38 @@
         });
         return links;
     }
-    /*function computePathCommands(d) {
+    function computePathCommands(d) {
         let getPath = d3.linkHorizontal()
             .x(d => d.y)
             .y(d => d.x);
-        let pathString = getPath(d).split(",");
-        return funct;
-    }*/
+        let pathString = getPath(d).split("C");
+        let subPathStrings = [pathString[0].split(","), pathString[1].split(",")];
+        let parsedInt1 = parseFloat(subPathStrings[0][1]);
+        let parsedInt2 = parseFloat(subPathStrings[1][5]);
+        if (parsedInt1 == parsedInt2) { // path is a straight line, tweak it to make it not straight
+            parsedInt1 -= 0.25;
+            parsedInt2 += 0.25;
+            subPathStrings[0][1] = parsedInt1.toString();
+            subPathStrings[1][5] = parsedInt2.toString();
+            pathString[0] = subPathStrings[0].join(",");
+            pathString[1] = subPathStrings[1].join(",");
+        }
+        return pathString.join("C");
+    }
+    function getGradientForTreeLink(d) {
+        if (!useGradientOnTreeEdges) return solidEdgeColor;
+        return "url(#horizontalGradFollowedLeft)";
+    }
     function getGradientForLink(d) {
         if (d.source.data.level == d.target.data.level) {  // drawing an arc since nodes are on the same level
+            if (!useGradientOnExtraEdgesWithin) return solidEdgeColor;
             if (d.source.x > d.target.x) {  // the arc goes from follower to followed node downward
                 return "url(#verticalGradFollowedUp)";
             } else {    // otherwise the arc goes from follower to followed node upward
                 return "url(#verticalGradFollowerUp)";
             }
         } else {    // drawing an edge between different levels
+            if (!useGradientOnExtraEdgesAcross) return solidEdgeColor;
             if (d.source.data.level < d.target.data.level) {   // the edge goes from an earlier level to later level
                 return "url(#horizontalGradFollowerLeft)";
             } else {    // otherwise the edge goes from a later level to earlier level
@@ -356,5 +297,20 @@
             (start - end)/2, 0, 0, ',',
             start < end ? 1 : 0, height, ',', end] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
             .join(' ');
+    }
+    function updateEdgeColors(type) {
+        if (type == "tree") {
+            useGradientOnTreeEdges = useGradientOnTreeEdges ? false : true;
+            svg.selectAll(".treeEdges")
+                .attr("stroke", getGradientForTreeLink);
+        } else if (type == "extraAcross") {
+            useGradientOnExtraEdgesAcross = useGradientOnExtraEdgesAcross ? false : true;
+            svg.selectAll(".extraEdgesAcrossLevels")
+                .attr("stroke", getGradientForLink);
+        } else {
+            useGradientOnExtraEdgesWithin = useGradientOnExtraEdgesWithin ? false : true;
+            svg.selectAll(".extraEdgesWithinLevels")
+                .attr("stroke", getGradientForLink);
+        }
     }
 </script>
