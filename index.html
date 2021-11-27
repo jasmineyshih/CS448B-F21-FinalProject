@@ -10,9 +10,36 @@
         visibility: hidden;
     }
     .selectedNode {
-        fill: lightseagreen;
-        stroke: black;
+        stroke: black !important;
         stroke-width: 2px;
+        fill-opacity: 1;
+    }
+    .collapsedNode {
+        stroke: #999;
+        fill: url(#patternCheckers);
+        stroke-width: 2px;
+        fill-opacity: 1;
+    }
+    .checker {
+        fill: #777;
+    }
+    .dimmedEdges {
+        stroke-opacity: 0.1;
+    }
+    .highlightedEdges {
+        stroke-opacity: 0.8;
+    }
+    #collapseExpandButton {
+        visibility: hidden;
+    }
+    .showButton {
+        visibility: visible !important;
+    }
+    .hiddenNodes {
+        visibility: hidden !important;
+    }
+    .hiddenEdges {
+        visibility: hidden !important;
     }
     #tooltip {
         position: absolute;			
@@ -39,12 +66,29 @@
 </style>
 
 <div>
-    <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
-    <label for="treeEdgeColoring">Use divergent coloring on tree edges</label>
-    <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
-    <label for="extraEdgeAcrossColoring">Use divergent coloring on extra edges within level</label>
-    <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
-    <label for="extraEdgeAcrossColoring">Use divergent coloring on extra edges across levels</label>
+    <div>
+        <span>Use divergent coloring on</span>
+        <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
+        <label for="treeEdgeColoring">tree edges</label>
+        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
+        <label for="extraEdgeAcrossColoring">extra edges within level</label>
+        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
+        <label for="extraEdgeAcrossColoring">extra edges across levels</label>
+    </div>
+    <div>
+        <span>Vary node size by</span>
+        <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
+        <label for="numLikes">Number of Likes</label>
+        <input type="radio" id="numCommentss" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
+        <label for="numCommentss">Number of Comments</label>
+        <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
+        <label for="likesCommentsRatio">Comments / Likes</label>
+        <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
+        <label for="uniformNodeSize">Use uniform size</label>
+    </div>
+    <div>
+        <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()"></button>
+    </div>
 </div>
 <!-- Create a div where the graph will take place -->
 <div id="viz">
@@ -88,6 +132,10 @@
                 <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
                 <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
             </linearGradient>
+            <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
+                <rect class="checker" x="0" width="2" height="2" y="0"/>
+                <rect class="checker" x="2" width="2" height="2" y="2"/>
+            </pattern>
         </defs>
     </svg>
 </div>
@@ -97,11 +145,18 @@
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
-    var selectedNode = null;
+    var selectedNodeId = null;
+    var attributeForNodeSize = null;
 
     /* svg variables */
     var svg = d3.select("#viz").select("svg");
     var solidEdgeColor = "#555";
+    var nodeHeight = 16;    // the total amount of vertical space each node takes up
+    var minRadius = 4;
+    var maxRadius = 8;
+    var midRadius = (minRadius + maxRadius) / 2
+    var nodeSizeScale;
+    var hiddenNodeSet = new Set();
 
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
@@ -113,14 +168,13 @@
         nodeData = data.nodes;
         linkData = data.links;
         preprocessData(nodeData, linkData, nodeLookup);   // transform data into the format we want
-        console.log(nodeData);
         fakeRoot = transformToNested(nodeData);
+        console.log(nodeData);
         Tree(fakeRoot, {
             /*label: d => d.id,*/
             width: 1000
         });
     });
-
     // Copyright 2021 Observable, Inc.
     // Released under the ISC license.
     // https://observablehq.com/@d3/tree
@@ -137,13 +191,13 @@
         linkTarget = "_blank", // the target attribute for links (if any)
         width = 640, // outer width, in pixels
         height, // outer height, in pixels
-        r = 4, // radius of nodes
+        r = maxRadius, // radius of nodes
         padding = 1, // horizontal padding for first and last column
         fill = "#999", // fill for nodes
-        fillOpacity, // fill opacity for nodes
+        fillOpacity = "0.8", // fill opacity for nodes
         stroke = "#555", // stroke for links
-        strokeWidth = 1.5, // stroke width for links
-        strokeOpacity = 0.4, // stroke opacity for links
+        strokeWidth = 2, // stroke width for links
+        strokeOpacity = 0.35, // stroke opacity for links
         strokeLinejoin, // stroke line join for links
         strokeLinecap, // stroke line cap for links
         halo = "#fff", // color of label halo 
@@ -185,7 +239,7 @@
         // Sort the nodes.
         if (sort != null) root.sort(sort);
         // Compute the layout.
-        const dx = 10;
+        const dx = nodeHeight;
         const dy = width / (root.height + padding);
         tree().nodeSize([dx, dy])(root);
 
@@ -216,11 +270,12 @@
             .selectAll("path")
             .data(root.links())
             .join("path")
+            .attr("class", d => `from${d.target.data.id} to${d.source.data.id}`)
             .classed("fakeRootElements", d => d.source.data.id == "0")
             .classed("treeEdges", true)
             .attr("stroke", getGradientForTreeLink)
             .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
-            .attr("d", computePathCommands);
+            .attr("d", computePathCommandsForTreeEdges);
 
         const node = svg.append("g")
             .selectAll("a")
@@ -233,9 +288,11 @@
             .attr("transform", d => `translate(${d.y},${d.x})`);
 
         node.append("circle")
-            .attr("fill", d => d.children ? stroke : fill)
-            .attr("r", r)
-            .on('click', updateSelectedNode);
+            .attr("id", d => "circle" + d.data.id)
+            .attr("fill", fill)
+            .attr("fill-opacity", fillOpacity)
+            .attr("r", computeNodeRadius)
+            .on("click", updateSelectedNode);
 
         let extraLinksBetweenNodes = getLinksBetweenNodes(root.descendants(), true, true);
         svg.append("g")
@@ -247,6 +304,7 @@
             .selectAll("path")
             .data(extraLinksBetweenNodes)
             .join("path")
+            .attr("class", d => `from${d.source.data.id} to${d.target.data.id}`)
             .classed("extraEdgesBetweenNodes", true)
             .classed("extraEdgesAcrossLevels", d => !d.sameLevel)
             .classed("extraEdgesWithinLevels", d => d.sameLevel)
@@ -265,6 +323,35 @@
             .attr("fill", "none")
             .attr("stroke", halo)
             .attr("stroke-width", haloWidth);
+    }
+    function updateNodeSizeAttribute(elem) {
+        attributeForNodeSize = elem.value;
+        if (attributeForNodeSize) {
+            let dataRange = d3.extent(nodeData.map(node => {
+                let parts = attributeForNodeSize.split("/");
+                if (parts.length == 2) {
+                    return (node[parts[0]]) / (node[parts[1]]);
+                }
+                return node[attributeForNodeSize];
+            }));
+            nodeSizeScale = d3.scaleSqrt().domain(dataRange).range([minRadius, maxRadius]);
+        } else {
+            nodeSizeScale = null;
+        }
+        updateNodeSize();
+    }
+    function updateNodeSize() {
+        svg.selectAll("circle")
+            .attr("r", computeNodeRadius);
+    }
+    function computeNodeRadius(d) {
+        if (!attributeForNodeSize) return midRadius;
+        let parts = attributeForNodeSize.split("/");
+        let scaleInput = d.data[attributeForNodeSize];
+        if (parts.length == 2) {
+            scaleInput = (d.data[parts[0]]) / (d.data[parts[1]])
+        }
+        return nodeSizeScale(scaleInput);
     }
     function getLinksBetweenNodes(nodeElems, includeAllLevels=false, includeDifferentParents=false) {
         let links = [];
@@ -290,7 +377,7 @@
         });
         return links;
     }
-    function computePathCommands(d) {
+    function computePathCommandsForTreeEdges(d) {
         let getPath = d3.linkHorizontal()
             .x(d => d.y)
             .y(d => d.x);
@@ -330,13 +417,16 @@
         }
     }
     function drawPathBetweenNodes(d) {
+        let pathString;
         if (d.source.data.level == d.target.data.level) { 
-            return drawArcBetweenSameLevel(d);
+            pathString = drawArcBetweenSameLevel(d);
+        } else {
+            let edgeFunct = d3.linkHorizontal()
+                .x(dt => dt.y)
+                .y(dt => dt.x);
+            pathString = edgeFunct(d);
         }
-        let edgeFunct = d3.linkHorizontal()
-            .x(dt => dt.y)
-            .y(dt => dt.x);
-        return edgeFunct(d);
+        return pathString;
     }
     function drawArcBetweenSameLevel(d) {
         let start = d.source.x;    // X position of start node on the X axis
@@ -365,17 +455,86 @@
         }
     }
     function updateSelectedNode(event, d) {
-        let newSelectedNode = d3.select(this);
-        if (selectedNode != newSelectedNode) {    // a new node has been selected
-            newSelectedNode.classed("selectedNode", true);
-            if (selectedNode) {
-                selectedNode.classed("selectedNode", false);
+        let newSelectedNodeId = d.data.id;
+        if (selectedNodeId != newSelectedNodeId) {    // a new node has been selected
+            d3.select("#circle" + newSelectedNodeId).classed("selectedNode", true);
+            if (selectedNodeId) {
+                d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
+            } else {
+                d3.selectAll("path").classed("dimmedEdges", true);  // dim all edges if no node was previously selected
             }
-            selectedNode = newSelectedNode;
+            updateHighlightedEdges(selectedNodeId, newSelectedNodeId);
+            selectedNodeId = newSelectedNodeId;
+            let selectedNodeObj = nodeLookup[selectedNodeId];
+            if (selectedNodeObj.children.length > 0) {  // nodes with no children should not be collapsed
+                d3.select("#collapseExpandButton")
+                    .classed("showButton", true)
+                    .html(selectedNodeObj.collapsed ? "Expand selected node" : "Collapse selected node");
+            }
         }
         d3.select("#idField").html(d.data.id);
         d3.select("#timestampField").html(d.data.timestamp);
         d3.select("#numLikesField").html(d.data.numLikes);
         d3.select("#numCommentsField").html(d.data.numComments);
+        event.stopPropagation();
+    }
+    svg.on('click', function () {   // mouse click on empty space in the svg
+        // deselect currently selected node
+        if (selectedNodeId) {
+            d3.select("#collapseExpandButton").classed("showButton", false);
+            d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
+            selectedNodeId = null;
+            d3.select("#idField").html("");
+            d3.select("#timestampField").html("");
+            d3.select("#numLikesField").html("");
+            d3.select("#numCommentsField").html("");
+            d3.selectAll(".highlightedEdges").classed("highlightedEdges", false); // dehighlight all edges if no node is selected now
+            d3.selectAll(".dimmedEdges").classed("dimmedEdges", false); // undim all edges if no node is selected now
+        }
+    });
+    function updateHighlightedEdges(oldId, newId) {
+        if (oldId) {
+            d3.selectAll(`.from${oldId},.to${oldId}`)
+                .classed("highlightedEdges", false);
+        }
+        d3.selectAll(`.from${newId},.to${newId}`)
+            .classed("highlightedEdges", true);
+    }
+    function collapseOrExpandSelectedNode() {
+        let selectedNode = nodeLookup[selectedNodeId];
+        if (selectedNode.children.length == 0) return;  // nodes with no children cannot be collapsed
+        let newState = selectedNode.collapsed ? false : true;
+        d3.select("#circle" + selectedNodeId).classed("collapsedNode", newState);
+        let nodeQueue = selectedNode.children.map(childNode => childNode);  // make a shallow copy of the children nodes since we'll pop from list
+        while (nodeQueue.length > 0) {
+            let currNode = nodeQueue.shift();
+            let currNodeId = currNode.id;
+            if (!newState)  {
+                hiddenNodeSet.delete(currNodeId);
+                if (currNode.collapsed) {   // if expanding a node, reset a previously collapsed child's status to false
+                    currNode.collapsed = false;
+                    d3.select("#circle" + currNodeId).classed("collapsedNode", false);
+                }
+                d3.selectAll(`.from${currNodeId},.to${currNodeId}`)
+                    .filter(function () {
+                        let connectedNodeClasses = d3.select(this).attr("class").split(" ");
+                        let fromClass = connectedNodeClasses[0];
+                        let toClass = connectedNodeClasses[1];
+                        let connectedToCollapsedNode = Array.from(hiddenNodeSet).find(hiddenId => fromClass.includes(hiddenId) || toClass.includes(hiddenId));
+                        return connectedToCollapsedNode == undefined;
+                    })
+                    .classed("hiddenEdges", false);
+            } else {
+                hiddenNodeSet.add(currNodeId);
+                d3.selectAll(`.from${currNodeId},.to${currNodeId}`)
+                    .classed("hiddenEdges", true);
+            }
+            d3.select("#node" + currNodeId)
+                .classed("hiddenNodes", newState);
+            nodeQueue = nodeQueue.concat(nodeLookup[currNodeId].children.map(childNode => childNode));
+        }
+        d3.select("#collapseExpandButton")
+            .html(newState ? "Expand selected node" : "Collapse selected node");
+        selectedNode.collapsed = newState;
     }
 </script>
