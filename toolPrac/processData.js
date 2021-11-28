@@ -24,9 +24,9 @@ function processData(nodeData, linkData) {
     linkData.forEach(link => {
         let sourceNode = nodeDataMap.get(link.source)
         let targetNode = nodeDataMap.get(link.target)
-        if (sourceNode.timestamp<=targetNode.timestamp){
-            sourceNode.allChildren.push(targetNode.id);
-            targetNode.parents.push(sourceNode.id);
+        if (sourceNode.timestamp>targetNode.timestamp){
+            sourceNode.parents.push(targetNode.id);
+            targetNode.allChildren.push(sourceNode.id);
             nodeDataMap.set(link.source, sourceNode)
             nodeDataMap.set(link.target, targetNode)
         }
@@ -54,7 +54,7 @@ function levelize(nodeMap){
                     let currNode = nodeMap.get(currId)
                     let children = currNode.allChildren
                     currQueue = currQueue.concat(children)
-                    if(currNode.level == -1 || currNode.level>currLevel){
+                    if(currNode.level <=0 || currNode.level>currLevel){
                         currNode.level = currLevel
                     }
                     count++
