@@ -53,6 +53,20 @@
         border-radius: 8px;			
         pointer-events: none;
     }
+    div.tooltipBars {	
+        position: absolute;			
+        text-align: center;				
+        padding: 2px;				
+        font: 12px sans-serif;		
+        background: #3F51B5;	
+        border: 0px;		
+        border-radius: 8px;			
+        pointer-events: none;
+        overflow: hidden;
+        color: white;
+        font-weight:600;
+        font-family: Open Sans;			
+    }
     .attributeContainer {
         width: 100%;
     }
@@ -148,6 +162,8 @@
     var selectedNodeId = null;
     var attributeForNodeSize = null;
 
+    let selectedNodesIds = []
+
     /* svg variables */
     var svg = d3.select("#viz").select("svg");
     var solidEdgeColor = "#555";
@@ -168,12 +184,15 @@
         nodeData = data.nodes;
         linkData = data.links;
         preprocessData(nodeData, linkData, nodeLookup);   // transform data into the format we want
+        nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
         Tree(fakeRoot, {
             /*label: d => d.id,*/
             width: 1000
         });
+        console.log(fakeRoot)
+        getTimeStamps(fakeRoot)
     });
     // Copyright 2021 Observable, Inc.
     // Released under the ISC license.
@@ -455,6 +474,11 @@
         }
     }
     function updateSelectedNode(event, d) {
+        selectedNodesIds.forEach(id => {
+            d3.select("#circle" + id).classed("selectedNode", false);
+            d3.selectAll(`.from${id},.to${id}`)
+                .classed("highlightedEdges", false);
+        })
         let newSelectedNodeId = d.data.id;
         if (selectedNodeId != newSelectedNodeId) {    // a new node has been selected
             d3.select("#circle" + newSelectedNodeId).classed("selectedNode", true);
@@ -536,5 +560,319 @@
         d3.select("#collapseExpandButton")
             .html(newState ? "Expand selected node" : "Collapse selected node");
         selectedNode.collapsed = newState;
+    }
+
+    function getTimeStamps(root){
+        tree = d3.hierarchy(root)
+        timestamps = []
+        tree.eachBefore(node =>{
+            time = node.data.timestamp
+            if (time !== undefined){
+                let datetime = new Date(time)
+                let date = datetime.getDate()
+                let month = datetime.getMonth()
+                let year = datetime.getFullYear()
+                let hour = datetime.getHours()
+                let min = datetime.getMinutes()
+                let seconds = datetime.getSeconds() 
+                timestamps.push(
+                    {
+                        'timestamp': time,
+                        'year': year,
+                        'month': month,
+                        'date': date,
+                        'hour': hour,
+                        'min': min,
+                        'seconds': seconds,
+                        'nodeId': node.data.id
+                    }
+                )
+            }
+        })
+
+        //nodeData is already sorted with respect to timestamp. So, timestamp is sorted too
+        console.log(timestamps)
+        let updatableData = []
+        getTimeStampByDate(timestamps, updatableData)
+        let svg = drawBarSvg()
+        drawBars(timestamps, updatableData, svg)
+        // setInterval(()=>{
+        //     getTimeStampByHour(timestamps, updatableData, 2,5,2020)
+        //     svg.selectAll('g').remove()
+        //     drawBars(timestamps, updatableData, svg)
+        // }, 3000)
+    }
+
+    function drawBarSvg(){
+        let width = window.innerWidth
+        let height = 300
+
+        let svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr('id', 'time_bars')
+        
+        return svg;
+    }
+
+    function drawBars(originalData, data, svg){
+        let width = window.innerWidth
+        let height = 300
+
+        let xVal = d => d.xLabel
+        let yVal = d => d.count
+
+        let margin = {top: 100, bottom: 100, left: 100, right: 100}
+        let innerWidth = width - margin.left - margin.right
+        let innerHeight = height - margin.top - margin.bottom
+
+        let xScale = d3.scaleBand()
+            .domain(data.map(d=>d.xLabel))
+            .range([0, innerWidth])
+            .padding(0.05)
+
+        let maxCount = d3.max(data, d=> d.count)
+        let yScale = d3.scaleLinear()
+            .domain([0, maxCount])
+            .range([innerHeight, 0])
+
+        let tooltipBars = d3.select("body").append("div")	
+            .attr("class", "tooltipBars")				
+            .style("opacity", 0);
+
+        // let svg = d3.select("body")
+        //     .append("svg")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr('id', 'time_bars')
+
+        let g = svg.append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+        g.append('g').call(d3.axisBottom(xScale))
+            .attr('transform', `translate(0, ${innerHeight})`)
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+        g.append('g').call(d3.axisLeft(yScale)
+            .tickSize(-innerWidth)
+            .tickFormat(d3.format("d"))
+            .ticks(maxCount>10?10:maxCount))
+            .selectAll(".tick, .domain")
+            .attr("stroke-opacity", 0.2)
+
+        
+        
+        console.log(yScale(59))
+
+        console.log(data)
+
+        // let timeBars = document.getElementById('time_bars')
+        // let svgBox = timeBars.viewBox.baseVal;
+        // console.log(svgBox)
+
+        let dataBars = g.selectAll('rect').data(data, d=>d.id)
+
+        dataBars.enter().append('rect').merge(dataBars)
+            .attr('x', d => xScale(xVal(d)))
+            .attr('width', xScale.bandwidth())
+            .attr('y', d => yScale(yVal(d)))
+            .attr('height', d => innerHeight - yScale(yVal(d)))
+            .attr("id", (d) => { return "data"+d.id})
+            .style('fill', 'steelblue')
+            .style("opacity", '0.8')
+            .on("mousemove", function(e,d) {
+                d3.select(`#data${d.id}`)
+                    .style("opacity", 1)
+                tooltipBars.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                tooltipBars.html(`Count: ${d.count}`)	
+                    .style("left", (e.clientX + 10) + "px")		
+                    .style("top", (e.clientY + 10) + "px");	
+            })
+            .on("mouseout", function(e,d) {	
+                d3.select(`#data${d.id}`)
+                    .style("opacity", '0.8')
+                tooltipBars.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+                })
+            .on("dblclick", function(e,d){
+                timestamp = d.timestamps[0]
+                if(d.measure === "day"){
+                    getTimeStampByHour(timestamps, data, timestamp.date,timestamp.month,timestamp.year)
+                }else if(d.measure === "hour"){
+                    getTimeStampByMinute(timestamps, data, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
+                }
+                selectedNodesByTimestamps(e,data)
+                svg.selectAll('g').remove()
+                d3.select(`#data${d.id}`)
+                    .style("opacity", '0.8')
+                tooltipBars.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);
+                drawBars(originalData, data, svg)
+            })
+            .on("click", function(e,d){
+                timestamp = d.timestamps[0]
+                if(d.measure === "day"){
+                    getTimeStampByHour(timestamps, data, timestamp.date,timestamp.month,timestamp.year)
+                }else if(d.measure === "hour"){
+                    getTimeStampByMinute(timestamps, data, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
+                }
+                selectedNodesByTimestamps(e,data)
+                d3.select(`#data${d.id}`)
+                    .style("opacity", '0.8')
+                tooltipBars.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);
+                d3.selectAll('rect')
+                    .style("fill", 'steelblue')
+                d3.select(`#data${d.id}`)
+                    .style("fill", 'red')
+            })
+
+            dataBars.exit().remove()
+    }
+
+    function getTimeStampByDate(originalData, updatableData){
+        updatableData.length = 0
+        let timeMap = new Map()
+        originalData.forEach(timeData =>{
+            let key = timeData.year+""+timeData.month+""+timeData.date
+            if (timeMap.has(key)){
+                let count  = timeMap.get(key).count+1
+                let timestamps = timeMap.get(key).timestamps
+                timestamps.push(timeData)
+                timeMap.set(key, {count: count, timestamps: timestamps})
+            }else{
+                timeMap.set(key, {count: 1, timestamps:[timeData]})
+            }
+        })
+        timeMap.forEach((value, key, map)=>{
+            let dateString = new Date(value.timestamps[0].timestamp).toDateString()
+            let id = key
+            updatableData.push({
+                measure: "day",
+                id: id,
+                xLabel: dateString,
+                timestamps: value.timestamps,
+                count: value.count
+            })
+        })
+        console.log(updatableData)
+    }
+
+    function getTimeStampByHour(originalData, updatableData, date, month, year){
+        updatableData.length = 0
+        let filteredData = originalData.filter(data => data.month === month &&
+                                                       data.year === year &&
+                                                       data.date === date);                                                   
+        let timeMap = new Map()
+        for (let i = 0; i<24; i++){
+            timeMap.set(i, {count: 0, timestamps:[]})
+        }
+        console.log(timeMap)
+        filteredData.forEach(timeData =>{
+            let key = timeData.hour
+            let count  = timeMap.get(key).count+1
+            let timestamps = timeMap.get(key).timestamps
+            timestamps.push(timeData)
+            timeMap.set(key, {count: count, timestamps: timestamps})
+        })
+        timeMap.forEach((value, key, map)=>{
+            let id = year+""+month+""+date+""+key
+            let xLabel = ""
+            if (key<11){
+                xLabel = `${key}AM-${key+1}AM`
+            }else if(key === 11){
+                xLabel = `${key}AM-${key+1}PM`
+            }else if(key>11 && key<23){
+                xLabel = `${key%12}PM-${(key+1)%12}PM`
+            }else{
+                xLabel = `${key%12}PM-${(key+1)%12}AM`
+            }
+            updatableData.push({
+                measure: "hour",
+                id: id,
+                xLabel: xLabel,
+                timestamps: value.timestamps,
+                count: value.count
+            })
+        })
+        console.log(updatableData)
+    }
+
+
+    function getTimeStampByMinute(originalData, updatableData, hour,date, month, year){
+        updatableData.length = 0
+        let filteredData = originalData.filter(data => data.month === month &&
+                                                       data.year === year &&
+                                                       data.date === date &&
+                                                       data.hour === hour);                                                   
+        let timeMap = new Map()
+        for (let i = 5; i<=60; i+=5){
+            timeMap.set(i, {count: 0, timestamps:[]})
+        }
+        
+        console.log(filteredData)
+        filteredData.forEach(timeData =>{
+            let key = Math.ceil(timeData.min/5)*5
+            if(key === 0){
+                key = 5
+            }
+            let count  = timeMap.get(key).count+1
+            let timestamps = timeMap.get(key).timestamps
+            timestamps.push(timeData)
+            timeMap.set(key, {count: count, timestamps: timestamps})
+        })
+        timeMap.forEach((value, key, map)=>{
+            let id = year+""+month+""+date+""+hour+""+key
+            let xLabel = ""
+            if (hour<11){
+                xLabel = `${hour}:${key-5}AM-${hour}:${key}AM`
+            }else if(key === 11){
+                xLabel = `${hour}:${key-5}AM-${hour}:${key}PM`
+            }else if(key>11 && key<23){
+                xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}PM`
+            }else{
+                xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}AM`
+            }
+            updatableData.push({
+                measure: "min",
+                id: id,
+                xLabel: xLabel,
+                timestamps: value.timestamps,
+                count: value.count
+            })
+        })
+        console.log(updatableData)
+    }
+
+    function selectedNodesByTimestamps(event, dataVals) {
+        // let newSelectedNodeId = d.data.id;
+        if (selectedNodeId) {
+            d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
+            d3.selectAll(`.from${selectedNodeId},.to${selectedNodeId}`)
+                .classed("highlightedEdges", false);
+        }
+        d3.selectAll("path").classed("dimmedEdges", true);
+        selectedNodesIds.forEach(id => {
+            d3.select("#circle" + id).classed("selectedNode", false);
+            d3.selectAll(`.from${id},.to${id}`)
+                .classed("highlightedEdges", false);
+        })
+        selectedNodesIds.length = 0
+        dataVals.forEach(data =>{
+            data.timestamps.forEach(item =>{
+                d3.select("#circle" + item.nodeId).classed("selectedNode", true);
+                selectedNodesIds.push(item.nodeId);
+                d3.selectAll(`.from${item.nodeId},.to${item.nodeId}`)
+                    .classed("highlightedEdges", true);
+            })
+        })
+        event.stopPropagation();
     }
 </script>
