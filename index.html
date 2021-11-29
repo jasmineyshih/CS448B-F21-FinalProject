@@ -792,16 +792,16 @@
         })
         timeMap.forEach((value, key, map)=>{
             let id = year+""+month+""+date+""+key
-            let xLabel = ""
-            if (key<11){
-                xLabel = `${key}AM-${key+1}AM`
-            }else if(key === 11){
-                xLabel = `${key}AM-${key+1}PM`
-            }else if(key>11 && key<23){
-                xLabel = `${key%12}PM-${(key+1)%12}PM`
-            }else{
-                xLabel = `${key%12}PM-${(key+1)%12}AM`
-            }
+            let xLabel = `${getStandardHour(key)}${getAmPm(key)}-${getStandardHour(key+1)}${getAmPm(key+1)}`
+            // if (key<11){
+            //     xLabel = `${key}AM-${key+1}AM`
+            // }else if(key === 11){
+            //     xLabel = `${key}AM-${key+1}PM`
+            // }else if(key>11 && key<23){
+            //     xLabel = `${key%12}PM-${(key+1)%12}PM`
+            // }else{
+            //     xLabel = `${key%12}PM-${(key+1)%12}AM`
+            // }
             updatableData.push({
                 measure: "hour",
                 id: id,
@@ -839,15 +839,20 @@
         timeMap.forEach((value, key, map)=>{
             let id = year+""+month+""+date+""+hour+""+key
             let xLabel = ""
-            if (hour<11){
-                xLabel = `${hour}:${key-5}AM-${hour}:${key}AM`
-            }else if(key === 11){
-                xLabel = `${hour}:${key-5}AM-${hour}:${key}PM`
-            }else if(key>11 && key<23){
-                xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}PM`
+            if (key<=55){
+                xLabel = `${getStandardHour(hour)}:${key-5<10?"0"+(key-5):key-5}${getAmPm(hour)}-${getStandardHour(hour)}:${key<10?"0"+key:key}${getAmPm(hour)}`
             }else{
-                xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}AM`
+                xLabel = `${getStandardHour(hour)}:${key-5}${getAmPm(hour)}-${getStandardHour(hour+1)}:00${getAmPm(hour+1)}`
             }
+            // if (hour<11){
+            //     xLabel = `${hour}:${key-5}AM-${hour}:${key}AM`
+            // }else if(key === 11){
+            //     xLabel = `${hour}:${key-5}AM-${hour}:${key}PM`
+            // }else if(key>11 && key<23){
+            //     xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}PM`
+            // }else{
+            //     xLabel = `${hour%12}:${key-5}PM-${(hour)%12}:${key}AM`
+            // }
             updatableData.push({
                 measure: "min",
                 id: id,
@@ -893,5 +898,22 @@
             })
         })
         event.stopPropagation();
+    }
+
+    function getAmPm(hour){
+        if (hour <= 11 || hour === 24)
+            return 'AM'
+        else
+            return 'PM'
+    }
+
+    function getStandardHour(hour){
+        if (hour === 0 || hour === 24){
+            return 12
+        }else if(hour > 12){
+            return hour%12
+        }else{
+            return hour
+        }
     }
 </script>
