@@ -77,6 +77,10 @@
     .attributeValue {
         display: inline;
     }
+
+    #bar_chart_viz {
+        user-select: none;
+    }
 </style>
 
 <div>
@@ -154,7 +158,10 @@
     </svg>
 </div>
 <div id='bar_chart_div'>
-
+    <div id="bar_chart_viz"></div>
+    <div id="bar_chart_controls">
+        <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
+    </div>
 </div>
 
 <script>
@@ -166,6 +173,12 @@
     var attributeForNodeSize = null;
 
     let selectedNodesIds = []
+
+    /*Bar chart variables*/
+    let bar_svg = null
+    let timestamps = []
+    let updatableData = []
+    let curr_time_measures = {}
 
     /* svg variables */
     var svg = d3.select("#viz").select("svg");
@@ -567,7 +580,6 @@
 
     function getTimeStamps(root){
         tree = d3.hierarchy(root)
-        timestamps = []
         tree.eachBefore(node =>{
             time = node.data.timestamp
             if (time !== undefined){
@@ -595,10 +607,9 @@
 
         //nodeData is already sorted with respect to timestamp. So, timestamp is sorted too
         console.log(timestamps)
-        let updatableData = []
         getTimeStampByDate(timestamps, updatableData)
-        let svg = drawBarSvg()
-        drawBars(timestamps, updatableData, svg)
+        bar_svg = drawBarSvg()
+        drawBars(timestamps, updatableData, bar_svg)
         // setInterval(()=>{
         //     getTimeStampByHour(timestamps, updatableData, 2,5,2020)
         //     svg.selectAll('g').remove()
@@ -610,12 +621,12 @@
         let width = window.innerWidth
         let height = 300
 
-        let svg = d3.select("#bar_chart_div")
+        let svg = d3.select("#bar_chart_viz")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
             .attr('id', 'time_bars')
-        
+            
         return svg;
     }
 
@@ -704,10 +715,14 @@
                 })
             .on("dblclick", function(e,d){
                 timestamp = d.timestamps[0]
+                if(d.measure === 'min') return
                 if(d.measure === "day"){
+                    document.getElementById('goBackButton').disabled = false;
                     getTimeStampByHour(timestamps, data, timestamp.date,timestamp.month,timestamp.year)
+                    curr_time_measures = {measure: "hour", date: timestamp.date, month: timestamp.month,year: timestamp.year}
                 }else if(d.measure === "hour"){
                     getTimeStampByMinute(timestamps, data, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
+                    curr_time_measures = {measure: "min", date: timestamp.date, month: timestamp.month,year: timestamp.year}
                 }
                 selectedNodesByTimestamps(e,data)
                 svg.selectAll('g').remove()
@@ -915,5 +930,22 @@
         }else{
             return hour
         }
+    }
+
+    function goBack(e){
+        if(curr_time_measures.measure === "hour"){
+            getTimeStampByDate(timestamps, updatableData)
+            curr_time_measures = {measure: "day"}
+            document.getElementById('goBackButton').disabled = true;
+        }else if(curr_time_measures.measure === "min"){
+            getTimeStampByHour(timestamps, updatableData, curr_time_measures.date,curr_time_measures.month, curr_time_measures.year)
+            curr_time_measures = {measure: "hour", date: timestamp.date, month: timestamp.month,year: timestamp.year}
+        }
+        selectedNodesByTimestamps(window.event,updatableData)
+        bar_svg.selectAll('g').remove()
+        d3.select('.tooltipBars').transition()		
+            .duration(500)		
+            .style("opacity", 0);
+        drawBars(timestamps, updatableData, bar_svg)
     }
 </script>
