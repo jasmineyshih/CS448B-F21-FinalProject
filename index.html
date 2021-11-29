@@ -153,6 +153,9 @@
         </defs>
     </svg>
 </div>
+<div id='bar_chart_div'>
+
+</div>
 
 <script>
     /* UI variables */
@@ -607,7 +610,7 @@
         let width = window.innerWidth
         let height = 300
 
-        let svg = d3.select("body")
+        let svg = d3.select("#bar_chart_div")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -637,7 +640,7 @@
             .domain([0, maxCount])
             .range([innerHeight, 0])
 
-        let tooltipBars = d3.select("body").append("div")	
+        let tooltipBars = d3.select("#bar_chart_div").append("div")	
             .attr("class", "tooltipBars")				
             .style("opacity", 0);
 
@@ -689,8 +692,8 @@
                     .duration(200)		
                     .style("opacity", .9);		
                 tooltipBars.html(`Count: ${d.count}`)	
-                    .style("left", (e.clientX + 10) + "px")		
-                    .style("top", (e.clientY + 10) + "px");	
+                    .style("left", (e.x + 10) + "px")		
+                    .style("top", (e.y + 10) + "px");	
             })
             .on("mouseout", function(e,d) {	
                 d3.select(`#data${d.id}`)
@@ -721,7 +724,12 @@
                     getTimeStampByHour(timestamps, data, timestamp.date,timestamp.month,timestamp.year)
                 }else if(d.measure === "hour"){
                     getTimeStampByMinute(timestamps, data, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
+                }else if(d.measure === 'min'){
+                    console.log("measure minute")
+                    selectTimeStampByMinute(timestamps, data, timestamp.min, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
                 }
+                console.log("after update")
+                console.log(data)
                 selectedNodesByTimestamps(e,data)
                 d3.select(`#data${d.id}`)
                     .style("opacity", '0.8')
@@ -848,11 +856,22 @@
                 count: value.count
             })
         })
+    }
+
+    function selectTimeStampByMinute(originalData, updatableData, minute, hour,date, month, year){
+        getTimeStampByMinute(originalData, updatableData,hour, date, month, year)
+        let key = Math.ceil(minute/5)*5
+        if(key === 0){
+            key = 5
+        }
         console.log(updatableData)
+        let id = year+""+month+""+date+""+hour+""+key
+        newData = updatableData.filter(datapoint => datapoint.id === id)
+        updatableData.length = 0
+        newData.forEach(item => updatableData.push(item))
     }
 
     function selectedNodesByTimestamps(event, dataVals) {
-        // let newSelectedNodeId = d.data.id;
         if (selectedNodeId) {
             d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
             d3.selectAll(`.from${selectedNodeId},.to${selectedNodeId}`)
