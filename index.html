@@ -81,8 +81,49 @@
     #bar_chart_viz {
         user-select: none;
     }
+
+    #viz {
+        overflow: scroll;
+    }
+
+    #complete_viz {
+        display: grid;
+        height: 100vh;
+        max-height: 100vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: .7fr 0.1fr .3fr;
+    }
+
+    #goBackButton{
+        margin: 0;
+        position: relative;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        background-color: darkblue;
+        border: none;
+        color: white;
+        padding: 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    button:disabled {
+        opacity: 0.3;
+    }
+
+    /* #complete_tool{
+        display: grid;
+        grid-template-columns: 0.3fr 0.7fr;
+    } */
+
+
 </style>
 
+<div id='complete_tool'>
 <div>
     <div>
         <span>Use divergent coloring on</span>
@@ -108,6 +149,7 @@
         <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()"></button>
     </div>
 </div>
+<div id="complete_viz">
 <!-- Create a div where the graph will take place -->
 <div id="viz">
     <div id="tooltip">
@@ -132,7 +174,7 @@
             <div class="attributeValue" id="degContributionField">###</div>
         </div>
     </div>
-    <svg>
+    <svg id="network">
         <defs>
             <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
@@ -157,11 +199,16 @@
         </defs>
     </svg>
 </div>
+<div>
+
+</div>
 <div id='bar_chart_div'>
     <div id="bar_chart_viz"></div>
     <div id="bar_chart_controls">
         <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
     </div>
+</div>
+</div>
 </div>
 
 <script>
@@ -227,7 +274,7 @@
         width = 640, // outer width, in pixels
         height, // outer height, in pixels
         r = maxRadius, // radius of nodes
-        padding = 1, // horizontal padding for first and last column
+        padding = 0, // horizontal padding for first and last column
         fill = "#999", // fill for nodes
         fillOpacity = "0.8", // fill opacity for nodes
         stroke = "#555", // stroke for links
@@ -278,6 +325,7 @@
         const dy = width / (root.height + padding);
         tree().nodeSize([dx, dy])(root);
 
+
         // Center the tree.
         let x0 = Infinity;
         let x1 = -x0;
@@ -286,10 +334,12 @@
             if (d.x < x0) x0 = d.x;
         });
 
+        height = 0.8*document.getElementById("viz").clientHeight
+        let height_mult = (x1 - x0 + dx * 2)/(height)
         // Compute the default height.
         if (height === undefined) height = x1 - x0 + dx * 2;
 
-        svg.attr("viewBox", [-dy * padding / 2, x0 - dx, width, height])
+        svg.attr("viewBox", [-dy * padding / 2, x0 - dx, width, height*height_mult])
             .attr("width", width)
             .attr("height", height)
             .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
@@ -618,8 +668,10 @@
     }
 
     function drawBarSvg(){
-        let width = window.innerWidth
-        let height = 300
+        let width = document.getElementById('bar_chart_div').clientWidth
+        let height = document.getElementById('bar_chart_div').clientHeight
+
+        console.log(width+" "+height)
 
         let svg = d3.select("#bar_chart_viz")
             .append("svg")
@@ -631,13 +683,13 @@
     }
 
     function drawBars(originalData, data, svg){
-        let width = window.innerWidth
-        let height = 300
+        let width = document.getElementById('bar_chart_div').clientWidth
+        let height = document.getElementById('bar_chart_div').clientHeight
 
         let xVal = d => d.xLabel
         let yVal = d => d.count
 
-        let margin = {top: 100, bottom: 100, left: 100, right: 100}
+        let margin = {top: height*0.1, bottom: height*0.5, left: width*0.2, right: width*0.2}
         let innerWidth = width - margin.left - margin.right
         let innerHeight = height - margin.top - margin.bottom
 
@@ -948,4 +1000,5 @@
             .style("opacity", 0);
         drawBars(timestamps, updatableData, bar_svg)
     }
+
 </script>
