@@ -348,6 +348,7 @@
     let timestamps = []
     let updatableData = []
     let curr_time_measures = {}
+    let xAxisLabel = ""
 
     /* svg variables */
     var svg = d3.select("#viz").select("svg");
@@ -990,6 +991,14 @@
                     .style("fill", 'steelblue')
                     .style("opacity", '0.8')
             })
+
+            g.append('text')
+                .attr('x', innerWidth/2)
+                .attr('y', innerHeight+margin.bottom*0.8)
+                .style('fill','black')
+                .attr("text-anchor","middle")
+                .text(`${xAxisLabel}`)
+
     }
 
     function getTimeStampByDate(originalData, updatableData){
@@ -1017,6 +1026,7 @@
                 count: value.count
             })
         })
+        xAxisLabel = "Days"
         console.log(updatableData)
     }
 
@@ -1030,6 +1040,7 @@
             timeMap.set(i, {count: 0, timestamps:[]})
         }
         console.log(timeMap)
+        xAxisLabel = "Hours ("+new Date(filteredData[0].timestamp).toDateString()+")"
         filteredData.forEach(timeData =>{
             let key = timeData.hour
             let count  = timeMap.get(key).count+1
@@ -1073,6 +1084,8 @@
         }
         
         console.log(filteredData)
+        xAxisLabel = "Minutes ("+new Date(filteredData[0].timestamp).toDateString()+" from "
+                        + `${getStandardHour(hour)}${getAmPm(hour)} to ${getStandardHour(hour+1)}${getAmPm(hour+1)})`
         filteredData.forEach(timeData =>{
             let key = Math.ceil(timeData.min/5)*5
             if(key === 0){
