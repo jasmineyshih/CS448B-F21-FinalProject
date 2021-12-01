@@ -19,9 +19,9 @@
         background: #dddddd;
         border: 2px solid black;
         border-radius: 5px;
+        height: fit-content;
     }
     .vizOptionsContainer {
-        width: 200px;
         margin: 10px;
         padding: 5px;
         font-size: 12px;
@@ -146,15 +146,15 @@
         opacity: 0.3;
     }
 
-    /* #complete_tool{
+    #complete_tool{
         display: grid;
-        grid-template-columns: 0.3fr 0.7fr;
-    } */
+        grid-template-columns: 0.15fr 0.85fr;
+    }
 
 
 </style>
-
-<div id='complete_tool' class="sidebar">
+<div id='complete_tool'>
+<div class="sidebar">
     <div class="vizOptionsContainer">
         <div>Use divergent coloring on</div>
         <div class="networkVizOptions">
@@ -266,14 +266,15 @@
         </div>
     </div>
 </div>
+</div>
 
 <script>
     /* UI variables */
     var windowWidth = window.innerWidth;
-    var networkGraphWidth = windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
+    var networkGraphWidth = document.getElementById('complete_viz').clientWidth////windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
     var windowHeight = window.innerHeight;
     var networkGraphHeight = windowHeight * 0.7;
-    var barGraphHeight = windowHeight * 0.3;
+    var barGraphHeight = windowHeight * 0.25;
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
@@ -766,8 +767,10 @@
     }
 
     function drawBarSvg(){
-        let width = document.getElementById('bar_chart_div').clientWidth
-        let height = document.getElementById('bar_chart_div').clientHeight
+        // let width = document.getElementById('bar_chart_div').clientWidth
+        // let height = document.getElementById('bar_chart_div').clientHeight
+        let width = networkGraphWidth;//document.getElementById('bar_chart_div').clientWidth
+        let height = barGraphHeight;//document.getElementById('bar_chart_div').clientHeight
 
         console.log(width+" "+height)
 
