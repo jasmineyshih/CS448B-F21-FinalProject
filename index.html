@@ -5,7 +5,65 @@
 <script src="https://d3js.org/d3.v6.js"></script>
 <script src="scripts/preprocess.js"></script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 <style>
+    body {
+        margin: 5px;
+    }
+    .sidebar {
+        font-family: 'Montserrat', sans-serif;
+        width: auto;
+        display: inline-block;
+        background: #dddddd;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+    .vizOptionsContainer {
+        width: 200px;
+        margin: 10px;
+        padding: 5px;
+        font-size: 12px;
+    }
+    .vizOptionsContainer button {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+    }
+    .vizOptionsContainer button:disabled {
+        opacity: 1;
+    }
+    .vizOptionsContainer p {
+        margin: 0 0 5px 0;
+        font-size: 10px;
+        font-style: italic;
+    }
+    .singleOption {
+        display: flex;
+        margin: 2px 0px;
+    }
+    .singleOption label {
+        margin-left: 3px;
+    }
+    #tooltip {		
+        text-align: left;			
+        width: auto;				
+        height: auto;					
+        padding: 5px 10px;				
+        font-size: 12px;		
+        background: lightsteelblue;		
+        pointer-events: none;
+    }
+    #complete_viz {
+        display: inline-block;
+        height: 100vh;
+        max-height: 100vh;
+        /*grid-template-columns: 1fr;
+        grid-template-rows: .7fr 0.1fr .3fr;*/
+    }
+    #viz {
+        overflow: scroll;
+    }
     .fakeRootElements {
         visibility: hidden;
     }
@@ -29,9 +87,6 @@
     .highlightedEdges {
         stroke-opacity: 0.8;
     }
-    #collapseExpandButton {
-        visibility: hidden;
-    }
     .showButton {
         visibility: visible !important;
     }
@@ -40,18 +95,6 @@
     }
     .hiddenEdges {
         visibility: hidden !important;
-    }
-    #tooltip {
-        position: absolute;			
-        text-align: left;			
-        width: auto;				
-        height: auto;					
-        padding: 5px;				
-        font: 10px sans-serif;		
-        background: lightsteelblue;	
-        border: 0px;		
-        border-radius: 8px;			
-        pointer-events: none;
     }
     div.tooltipBars {	
         position: absolute;			
@@ -80,18 +123,6 @@
 
     #bar_chart_viz {
         user-select: none;
-    }
-
-    #viz {
-        overflow: scroll;
-    }
-
-    #complete_viz {
-        display: grid;
-        height: 100vh;
-        max-height: 100vh;
-        grid-template-columns: 1fr;
-        grid-template-rows: .7fr 0.1fr .3fr;
     }
 
     #goBackButton{
@@ -123,96 +154,126 @@
 
 </style>
 
-<div id='complete_tool'>
-<div>
-    <div>
-        <span>Use divergent coloring on</span>
-        <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
-        <label for="treeEdgeColoring">tree edges</label>
-        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
-        <label for="extraEdgeAcrossColoring">extra edges within level</label>
-        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
-        <label for="extraEdgeAcrossColoring">extra edges across levels</label>
+<div id='complete_tool' class="sidebar">
+    <div class="vizOptionsContainer">
+        <div>Use divergent coloring on</div>
+        <div class="networkVizOptions">
+            <div class="singleOption">
+                <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
+                <label for="treeEdgeColoring">tree edges</label>
+            </div>
+            <div class="singleOption">
+                <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
+                <label for="extraEdgeAcrossColoring">non-tree edges within the same level</label>
+            </div>
+            <div class="singleOption">
+                <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
+                <label for="extraEdgeAcrossColoring">non-tree edges across different levels</label>
+            </div>
+        </div>
     </div>
-    <div>
-        <span>Vary node size by</span>
-        <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
-        <label for="numLikes">Number of Likes</label>
-        <input type="radio" id="numCommentss" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
-        <label for="numCommentss">Number of Comments</label>
-        <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
-        <label for="likesCommentsRatio">Comments / Likes</label>
-        <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
-        <label for="uniformNodeSize">Use uniform size</label>
+    <div class="vizOptionsContainer">
+        <div>Vary node size by</div>
+        <div class="networkVizOptions">
+            <div class="singleOption">
+                <input type="radio" id="incomingEdges" name="nodeSizeAttribute" value="incomingEdges" onclick="updateNodeSizeAttribute(this)">
+                <label for="incomingEdges">number of incoming edges</label>
+            </div>
+            <div class="singleOption">
+                <input type="radio" id="outgoingEdges" name="nodeSizeAttribute" value="outgoingEdges" onclick="updateNodeSizeAttribute(this)">
+                <label for="outgoingEdges">number of outgoing edges</label>
+            </div>
+            <div class="singleOption">
+                <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
+                <label for="numLikes">number of likes</label>
+            </div>
+            <div class="singleOption">
+                <input type="radio" id="numComments" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
+                <label for="numComments">number of comments</label>
+            </div>
+            <div class="singleOption">
+                <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
+                <label for="likesCommentsRatio">comments / likes</label>
+            </div>
+            <div class="singleOption">
+                <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
+                <label for="uniformNodeSize">use uniform size</label>
+            </div>
+        </div>
     </div>
-    <div>
-        <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()"></button>
+    <div class="vizOptionsContainer">
+        <p>Click on a non-leaf node to select it, and then click the button below to collapse or expand the node</p>
+        <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a node to collapse</button>
+    </div>
+    <div class="vizOptionsContainer">
+        <p>The selected node's information is displayed below</p>
+        <div id="tooltip">
+            <div class="attributeContainer">
+                <div class="attributeLabel">Node ID:</div>
+                <div class="attributeValue" id="idField">###</div>
+            </div>
+            <div class="attributeContainer">
+                <div class="attributeLabel">Timestamp:</div>
+                <div class="attributeValue" id="timestampField">###</div>
+            </div>
+            <div class="attributeContainer">
+                <div class="attributeLabel">Number of Likes:</div>
+                <div class="attributeValue" id="numLikesField">###</div>
+            </div>
+            <div class="attributeContainer">
+                <div class="attributeLabel">Number of Comments:</div>
+                <div class="attributeValue" id="numCommentsField">###</div>
+            </div>
+            <div class="attributeContainer">
+                <div class="attributeLabel">Degree of Contribution:</div>
+                <div class="attributeValue" id="degContributionField">###</div>
+            </div>
+        </div>
     </div>
 </div>
 <div id="complete_viz">
 <!-- Create a div where the graph will take place -->
-<div id="viz">
-    <div id="tooltip">
-        <div class="attributeContainer">
-            <div class="attributeLabel">Node ID:</div>
-            <div class="attributeValue" id="idField">###</div>
-        </div>
-        <div class="attributeContainer">
-            <div class="attributeLabel">Timestamp:</div>
-            <div class="attributeValue" id="timestampField">###</div>
-        </div>
-        <div class="attributeContainer">
-            <div class="attributeLabel">Number of Likes:</div>
-            <div class="attributeValue" id="numLikesField">###</div>
-        </div>
-        <div class="attributeContainer">
-            <div class="attributeLabel">Number of Comments:</div>
-            <div class="attributeValue" id="numCommentsField">###</div>
-        </div>
-        <div class="attributeContainer">
-            <div class="attributeLabel">Degree of Contribution:</div>
-            <div class="attributeValue" id="degContributionField">###</div>
+    <div id="viz">
+        <svg id="network">
+            <defs>
+                <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                </linearGradient>
+                <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
+                    <rect class="checker" x="0" width="2" height="2" y="0"/>
+                    <rect class="checker" x="2" width="2" height="2" y="2"/>
+                </pattern>
+            </defs>
+        </svg>
+    </div>
+    <div id='bar_chart_div'>
+        <div id="bar_chart_viz"></div>
+        <div id="bar_chart_controls">
+            <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
         </div>
     </div>
-    <svg id="network">
-        <defs>
-            <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-            </linearGradient>
-            <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-            </linearGradient>
-            <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-            </linearGradient>
-            <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-            </linearGradient>
-            <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
-                <rect class="checker" x="0" width="2" height="2" y="0"/>
-                <rect class="checker" x="2" width="2" height="2" y="2"/>
-            </pattern>
-        </defs>
-    </svg>
-</div>
-<div>
-
-</div>
-<div id='bar_chart_div'>
-    <div id="bar_chart_viz"></div>
-    <div id="bar_chart_controls">
-        <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
-    </div>
-</div>
-</div>
 </div>
 
 <script>
     /* UI variables */
+    var windowWidth = window.innerWidth;
+    var networkGraphWidth = windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
+    var windowHeight = window.innerHeight;
+    var networkGraphHeight = windowHeight * 0.7;
+    var barGraphHeight = windowHeight * 0.3;
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
@@ -236,6 +297,7 @@
     var midRadius = (minRadius + maxRadius) / 2
     var nodeSizeScale;
     var hiddenNodeSet = new Set();
+    var collapsedNodeSet = new Set();
 
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
@@ -250,9 +312,11 @@
         nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
+        computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);
         Tree(fakeRoot, {
             /*label: d => d.id,*/
-            width: 1000
+            width: networkGraphWidth,
+            height : windowHeight * 0.7
         });
         console.log(fakeRoot)
         getTimeStamps(fakeRoot)
@@ -334,7 +398,6 @@
             if (d.x < x0) x0 = d.x;
         });
 
-        height = 0.8*document.getElementById("viz").clientHeight
         let height_mult = (x1 - x0 + dx * 2)/(height)
         // Compute the default height.
         if (height === undefined) height = x1 - x0 + dx * 2;
@@ -359,7 +422,7 @@
             .classed("fakeRootElements", d => d.source.data.id == "0")
             .classed("treeEdges", true)
             .attr("stroke", getGradientForTreeLink)
-            .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
+            .attr("id", d => "link" + d.target.data.id + "to" + d.source.data.id)
             .attr("d", computePathCommandsForTreeEdges);
 
         const node = svg.append("g")
@@ -394,6 +457,7 @@
             .classed("extraEdgesAcrossLevels", d => !d.sameLevel)
             .classed("extraEdgesWithinLevels", d => d.sameLevel)
             .attr("stroke", getGradientForLink)
+            .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
             .attr("d", drawPathBetweenNodes);
 
         if (title != null) node.append("title")
@@ -411,7 +475,13 @@
     }
     function updateNodeSizeAttribute(elem) {
         attributeForNodeSize = elem.value;
-        if (attributeForNodeSize) {
+        if (attributeForNodeSize == "incomingEdges") {
+            let dataRange = d3.extent(nodeData.map(node => node.allChildren.length));
+            nodeSizeScale = d3.scaleSqrt().domain(dataRange).range([minRadius, maxRadius]);
+        } else if (attributeForNodeSize == "outgoingEdges") {
+            let dataRange = d3.extent(nodeData.map(node => node.parents.length));
+            nodeSizeScale = d3.scaleSqrt().domain(dataRange).range([minRadius, maxRadius]);
+        } else if (attributeForNodeSize) {
             let dataRange = d3.extent(nodeData.map(node => {
                 let parts = attributeForNodeSize.split("/");
                 if (parts.length == 2) {
@@ -430,11 +500,17 @@
             .attr("r", computeNodeRadius);
     }
     function computeNodeRadius(d) {
-        if (!attributeForNodeSize) return midRadius;
+        if (!attributeForNodeSize || d.data.id == "0") return midRadius;
         let parts = attributeForNodeSize.split("/");
-        let scaleInput = d.data[attributeForNodeSize];
-        if (parts.length == 2) {
+        let scaleInput;
+        if (attributeForNodeSize == "incomingEdges") {
+            scaleInput = d.data.allChildren.length;
+        } else if (attributeForNodeSize == "outgoingEdges") {
+            scaleInput = d.data.parents.length;
+        } else if (parts.length == 2) {
             scaleInput = (d.data[parts[0]]) / (d.data[parts[1]])
+        } else {
+            scaleInput = d.data[attributeForNodeSize]
         }
         return nodeSizeScale(scaleInput);
     }
@@ -519,7 +595,7 @@
         let height = d.source.y; // this would be the same for the two points since they are in the same level
         return ['M', height, start,    // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
             'A',                            // This means we're gonna build an elliptical arc
-            (start - end)/2, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
+            (start - end)/3, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
             (start - end)/2, 0, 0, ',',
             start < end ? 1 : 0, height, ',', end] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
             .join(' ');
@@ -556,16 +632,16 @@
             updateHighlightedEdges(selectedNodeId, newSelectedNodeId);
             selectedNodeId = newSelectedNodeId;
             let selectedNodeObj = nodeLookup[selectedNodeId];
-            if (selectedNodeObj.children.length > 0) {  // nodes with no children should not be collapsed
-                d3.select("#collapseExpandButton")
-                    .classed("showButton", true)
-                    .html(selectedNodeObj.collapsed ? "Expand selected node" : "Collapse selected node");
-            }
+            d3.select("#collapseExpandButton")
+                .classed("showButton", true)
+                .html(selectedNodeObj.collapsed ? "Expand selected node" : "Collapse selected node")
+                .attr("disabled", selectedNodeObj.children.length > 0 ? null : "");
         }
         d3.select("#idField").html(d.data.id);
         d3.select("#timestampField").html(d.data.timestamp);
         d3.select("#numLikesField").html(d.data.numLikes);
         d3.select("#numCommentsField").html(d.data.numComments);
+        d3.select("#degContributionField").html(d.data.degOfContribution);
         event.stopPropagation();
     }
     svg.on('click', function () {   // mouse click on empty space in the svg
@@ -578,6 +654,7 @@
             d3.select("#timestampField").html("");
             d3.select("#numLikesField").html("");
             d3.select("#numCommentsField").html("");
+            d3.select("#degContributionField").html("");
             d3.selectAll(".highlightedEdges").classed("highlightedEdges", false); // dehighlight all edges if no node is selected now
             d3.selectAll(".dimmedEdges").classed("dimmedEdges", false); // undim all edges if no node is selected now
         }
@@ -592,40 +669,61 @@
     }
     function collapseOrExpandSelectedNode() {
         let selectedNode = nodeLookup[selectedNodeId];
-        if (selectedNode.children.length == 0) return;  // nodes with no children cannot be collapsed
-        let newState = selectedNode.collapsed ? false : true;
-        d3.select("#circle" + selectedNodeId).classed("collapsedNode", newState);
-        let nodeQueue = selectedNode.children.map(childNode => childNode);  // make a shallow copy of the children nodes since we'll pop from list
-        while (nodeQueue.length > 0) {
+        if (selectedNode.children.length == 0) return;  // nodes with no children cannot be collapsed, so do nothing
+        let newStateIsCollapse = selectedNode.collapsed ? false : true; // true if node was previously not collapsed, and false if node was previously collapsed
+        d3.select("#circle" + selectedNodeId).classed("collapsedNode", newStateIsCollapse); // apply, or remove, the collpasedNode class
+        if (newStateIsCollapse) {
+            collapsedNodeSet.add(selectedNodeId);
+        } else {
+            collapsedNodeSet.delete(selectedNodeId);
+        }
+        // we only want to hide or unhide a child node if it has no other parents than the selected node
+        //let nodeQueue = selectedNode.children.map(childNode => childNode);
+        let nodeQueue = selectedNode.allChildren.map(childId => nodeLookup[childId]);
+        //let nodeQueue = allChildrenNodes.filter(childNode => childNode.parents.length == 1);  // make a shallow copy of the children nodes since we'll pop from list
+        while (nodeQueue.length > 0) {  // recursively go through the children nodes to update them
             let currNode = nodeQueue.shift();
             let currNodeId = currNode.id;
-            if (!newState)  {
-                hiddenNodeSet.delete(currNodeId);
+            if (!newStateIsCollapse)  { // if we're expanding the selected node
+                hiddenNodeSet.delete(currNodeId);   // remove this child node from the hidden node list, if it's previously hidden
                 if (currNode.collapsed) {   // if expanding a node, reset a previously collapsed child's status to false
                     currNode.collapsed = false;
                     d3.select("#circle" + currNodeId).classed("collapsedNode", false);
                 }
-                d3.selectAll(`.from${currNodeId},.to${currNodeId}`)
-                    .filter(function () {
+                d3.selectAll(`.from${currNodeId},.to${currNodeId}`) // select all the edges associated with this child node
+                    .filter(function () {                           // and keep only the edges not connected to a hidden or collapsed node
                         let connectedNodeClasses = d3.select(this).attr("class").split(" ");
                         let fromClass = connectedNodeClasses[0];
                         let toClass = connectedNodeClasses[1];
-                        let connectedToCollapsedNode = Array.from(hiddenNodeSet).find(hiddenId => fromClass.includes(hiddenId) || toClass.includes(hiddenId));
-                        return connectedToCollapsedNode == undefined;
+                        let connectedToHiddenNode = Array.from(hiddenNodeSet).some(hiddenId => fromClass.includes(hiddenId) || toClass.includes(hiddenId));
+                        let connectedToCollapsedNode = Array.from(collapsedNodeSet).find(collapsedId => fromClass.includes(collapsedId) || toClass.includes(collapsedId));
+                        return !connectedToHiddenNode && !connectedToCollapsedNode;
                     })
                     .classed("hiddenEdges", false);
-            } else {
-                hiddenNodeSet.add(currNodeId);
-                d3.selectAll(`.from${currNodeId},.to${currNodeId}`)
-                    .classed("hiddenEdges", true);
+                d3.select("#node" + currNodeId)
+                    .classed("hiddenNodes", false);
+            } else {    // if we're collapsing the selected node
+                let nodeHasUncollapsedParents = currNode.parents.some(parentId => !hiddenNodeSet.has(parentId) && !collapsedNodeSet.has(parentId));
+                if (!nodeHasUncollapsedParents) {   // only hide this child node if it all its parents are hidden or collapsed
+                    hiddenNodeSet.add(currNodeId);
+                    d3.selectAll(`.from${currNodeId},.to${currNodeId}`)
+                        .classed("hiddenEdges", true);
+                    d3.select("#node" + currNodeId)
+                        .classed("hiddenNodes", true);
+                } else {    // if we're not hiding this child node, we still need to hide the edges from it to all currently collapsed nodes, if any
+                    Array.from(collapsedNodeSet).forEach(function (collapsedNodeId) {
+                        let nodes = d3.select(`#link${currNodeId}to${collapsedNodeId}`)
+                            .classed("hiddenEdges", true);
+                    })
+                }
             }
-            d3.select("#node" + currNodeId)
-                .classed("hiddenNodes", newState);
-            nodeQueue = nodeQueue.concat(nodeLookup[currNodeId].children.map(childNode => childNode));
+            // we only want to hide or unhide a child node if it has no other parents than the selected node
+            //nodeQueue = nodeQueue.concat(nodeLookup[currNodeId].children.map(childNode => childNode));
+            nodeQueue = nodeQueue.concat(nodeLookup[currNodeId].allChildren.map(childId => nodeLookup[childId]));
         }
         d3.select("#collapseExpandButton")
-            .html(newState ? "Expand selected node" : "Collapse selected node");
-        selectedNode.collapsed = newState;
+            .html(newStateIsCollapse ? "Expand selected node" : "Collapse selected node");
+        selectedNode.collapsed = newStateIsCollapse;
     }
 
     function getTimeStamps(root){
@@ -683,8 +781,8 @@
     }
 
     function drawBars(originalData, data, svg){
-        let width = document.getElementById('bar_chart_div').clientWidth
-        let height = document.getElementById('bar_chart_div').clientHeight
+        let width = networkGraphWidth;//document.getElementById('bar_chart_div').clientWidth
+        let height = barGraphHeight;//document.getElementById('bar_chart_div').clientHeight
 
         let xVal = d => d.xLabel
         let yVal = d => d.count

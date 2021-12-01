@@ -29,6 +29,7 @@ function preprocessData(nodeData, linkData, nodeLookup) {
     levelize(nodeDataMap);
     setDirectParentChildren(nodeDataMap);
     sortChildren(nodeDataMap);
+
 }
 function levelize(nodeMap){
     nodeMap.forEach((node, id, map) => {
@@ -71,7 +72,7 @@ function sortChildren(nodeMap){
         node.allChildren.sort((child1, child2)=>nodeMap.get(child1).timestamp - nodeMap.get(child2).timestamp)
     })
 }
-function transformToNested() {
+function transformToNested(nodeData) {
     nodeData.forEach(function (node) {
         node.children = [];
         node.allChildren.forEach(function (childId) {
@@ -92,4 +93,30 @@ function transformToNested() {
     }
     fakeRootNode.children.sort((a, b) => a.timestamp - b.timestamp);
     return fakeRootNode;
+}
+function computeDegreeOfContributionForAllNodes(nodeData, nodeLookup) {
+    nodeData.forEach(function (node) {
+        node.degOfContribution = getDegreeOfContribution(node, nodeLookup);
+    });
+}
+function getDegreeOfContribution(node, nodeLookup) {
+    if (node.degOfContribution != undefined) {   // if the degree of contribution of this node has already been computed, return it
+        return node.degOfContribution;
+    }
+    if (node.children.length == 0) { // base case - node is a leaf node, which by default has a degree of contribution of 0
+        return 0;
+    }
+    let totalDegOfCont = 0;
+    //node.allChildren.map(childId => nodeLookup[childId]).forEach(function (childNode) {
+    node.children.forEach(function (childNode) {
+        if (childNode.parents.length == 1) {    // if this child depends solely on this node, count this child node and the child node's degree of contribution
+            totalDegOfCont += 1 + getDegreeOfContribution(childNode, nodeLookup);
+        }
+        let otherParents = childNode.parents.filter(parentId => parentId != childNode.directParent);
+        let otherParentsAreSiblings = otherParents.length > 0 && otherParents.every(parentId => nodeLookup[parentId].directParent == childNode.directParent);
+        if (otherParentsAreSiblings) {
+            totalDegOfCont += 1;
+        }
+    });
+    return totalDegOfCont;
 }
