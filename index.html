@@ -63,6 +63,45 @@
     }
     #viz {
         overflow: scroll;
+        position: relative;
+    }
+    #legend {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background: white;
+        border: 2px solid black;
+        border-radius: 4px;
+        padding: 0.5em;
+        margin: 0.5em;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        text-align: left;
+        width: 360px;
+    }
+    .graphicWrapper {
+        width: 3em;
+        height: 100%;
+        float: left;
+    }
+    #nodeLegend {
+        margin: auto;
+        height: 1em;
+        width: 1em;
+        background-color: #999;
+        border-radius: 50%;
+    }
+    #followerLegend {
+        width: 1.5em;
+        height: 0.2em;
+        margin: 0.5em 0.5em 0.3em auto;
+        background-color: blue;
+    }
+    #followedLegend {
+        width: 1.5em;
+        height: 0.2em;
+        margin: 0.5em 0.5em 0.3em auto;
+        background-color: red;
     }
     .fakeRootElements {
         visibility: hidden;
@@ -258,6 +297,27 @@
                 </pattern>
             </defs>
         </svg>
+        <div id="legend">
+            <div style="text-align: center;">Legend</div>
+            <div class="legendItem">
+                <div class="graphicWrapper">
+                    <div class="legendGraphic" id="nodeLegend"></div>
+                </div>
+                <div class="legendText">A user who has posted the viral hashtag</div>
+            </div>
+            <div class="legendItem">
+                <div class="graphicWrapper">
+                    <div class="legendGraphic" id="followerLegend"></div>
+                </div>
+                <div class="legendText">End of edge connected to the user following another user</div>
+            </div>
+            <div class="legendItem">
+                <div class="graphicWrapper">
+                    <div class="legendGraphic" id="followedLegend"></div>
+                </div>
+                <div class="legendText">End of edge connected to the user being followed</div>
+            </div>
+        </div>
     </div>
     <div id='bar_chart_div'>
         <div id="bar_chart_viz"></div>
@@ -473,6 +533,7 @@
             .attr("fill", "none")
             .attr("stroke", halo)
             .attr("stroke-width", haloWidth);
+        drawLegend();
     }
     function updateNodeSizeAttribute(elem) {
         attributeForNodeSize = elem.value;
