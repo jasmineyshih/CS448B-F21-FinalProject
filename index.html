@@ -533,7 +533,6 @@
             .attr("fill", "none")
             .attr("stroke", halo)
             .attr("stroke-width", haloWidth);
-        drawLegend();
     }
     function updateNodeSizeAttribute(elem) {
         attributeForNodeSize = elem.value;
@@ -700,7 +699,7 @@
                 .attr("disabled", selectedNodeObj.children.length > 0 ? null : "");
         }
         d3.select("#idField").html(d.data.id);
-        d3.select("#timestampField").html(d.data.timestamp);
+        d3.select("#timestampField").html(d.data.timeString);
         d3.select("#numLikesField").html(d.data.numLikes);
         d3.select("#numCommentsField").html(d.data.numComments);
         d3.select("#degContributionField").html(d.data.degOfContribution);

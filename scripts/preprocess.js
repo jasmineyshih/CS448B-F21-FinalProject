@@ -8,6 +8,14 @@ function preprocessData(nodeData, linkData, nodeLookup) {
         nodeObj.otherFollowing = [];
         nodeObj.level = -1;
         nodeLookup[nodeObj.id] = nodeObj;
+        let datetime = new Date(nodeObj.timestamp * 1000)
+        let date = datetime.getDate()
+        let month = datetime.getMonth()
+        let year = datetime.getFullYear()
+        let hour = datetime.getHours()
+        let min = datetime.getMinutes()
+        let seconds = datetime.getSeconds()
+        nodeObj.timeString = `${month + 1}/${date} ${hour}:${min}:${seconds}`;
     });
     nodeData.sort((a, b) => a.timestamp - b.timestamp);
     let nodeDataMap = new Map();
