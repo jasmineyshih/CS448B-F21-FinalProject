@@ -648,18 +648,29 @@
     svg.on('click', function () {   // mouse click on empty space in the svg
         // deselect currently selected node
         if (selectedNodeId) {
-            d3.select("#collapseExpandButton").classed("showButton", false);
-            d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
-            selectedNodeId = null;
-            d3.select("#idField").html("");
-            d3.select("#timestampField").html("");
-            d3.select("#numLikesField").html("");
-            d3.select("#numCommentsField").html("");
-            d3.select("#degContributionField").html("");
-            d3.selectAll(".highlightedEdges").classed("highlightedEdges", false); // dehighlight all edges if no node is selected now
-            d3.selectAll(".dimmedEdges").classed("dimmedEdges", false); // undim all edges if no node is selected now
+            deselectSelectedNodes()
         }
     });
+
+    function deselectSelectedNodes(){
+        d3.select("#collapseExpandButton").classed("showButton", false);
+        d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
+        selectedNodeId = null;
+        selectedNodesIds.forEach(id => {
+            d3.select("#circle" + id).classed("selectedNode", false);
+            d3.selectAll(`.from${id},.to${id}`)
+                .classed("highlightedEdges", false);
+        })
+        selectedNodesIds.length = 0
+        d3.select("#idField").html("");
+        d3.select("#timestampField").html("");
+        d3.select("#numLikesField").html("");
+        d3.select("#numCommentsField").html("");
+        d3.select("#degContributionField").html("");
+        d3.selectAll(".highlightedEdges").classed("highlightedEdges", false); // dehighlight all edges if no node is selected now
+        d3.selectAll(".dimmedEdges").classed("dimmedEdges", false); // undim all edges if no node is selected now
+    }
+
     function updateHighlightedEdges(oldId, newId) {
         if (oldId) {
             d3.selectAll(`.from${oldId},.to${oldId}`)
@@ -911,6 +922,14 @@
             })
 
             dataBars.exit().remove()
+
+
+            svg.on("click", function(e){
+                deselectSelectedNodes()
+                d3.selectAll('rect')
+                    .style("fill", 'steelblue')
+                    .style("opacity", '0.8')
+            })
     }
 
     function getTimeStampByDate(originalData, updatableData){
@@ -1037,7 +1056,6 @@
         if(key === 0){
             key = 5
         }
-        console.log(updatableData)
         let id = year+""+month+""+date+""+hour+""+key
         newData = updatableData.filter(datapoint => datapoint.id === id)
         updatableData.length = 0
