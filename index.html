@@ -62,7 +62,7 @@
         grid-template-rows: .7fr 0.1fr .3fr;*/
     }
     #viz {
-        overflow: scroll;
+        /*overflow: scroll;*/
         position: relative;
     }
     #legend {
@@ -187,13 +187,13 @@
 
     #complete_tool{
         display: grid;
-        grid-template-columns: 0.15fr 0.85fr;
+        grid-template-columns: 1fr 2fr;
     }
 
 
 </style>
 <div id='complete_tool'>
-<div class="sidebar">
+<div class="sidebar" id="sidebarTool">
     <div class="vizOptionsContainer">
         <div>Use divergent coloring on</div>
         <div class="networkVizOptions">
@@ -269,6 +269,13 @@
             </div>
         </div>
     </div>
+
+    <div id='bar_chart_div'>
+        <div id="bar_chart_viz"></div>
+        <div id="bar_chart_controls">
+            <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
+        </div>
+    </div>
 </div>
 <div id="complete_viz">
 <!-- Create a div where the graph will take place -->
@@ -319,22 +326,17 @@
             </div>
         </div>
     </div>
-    <div id='bar_chart_div'>
-        <div id="bar_chart_viz"></div>
-        <div id="bar_chart_controls">
-            <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
-        </div>
-    </div>
 </div>
 </div>
 
 <script>
     /* UI variables */
+    var sidebarWidth = document.getElementById('sidebarTool').clientWidth;
     var windowWidth = window.innerWidth;
     var networkGraphWidth = document.getElementById('complete_viz').clientWidth////windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
     var windowHeight = window.innerHeight;
-    var networkGraphHeight = windowHeight * 0.7;
-    var barGraphHeight = windowHeight * 0.25;
+    var networkGraphHeight = document.getElementById('complete_viz').clientHeight - 20;//windowHeight * 0.95;
+    var barGraphHeight = windowHeight * 0.3;
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
@@ -378,7 +380,7 @@
         Tree(fakeRoot, {
             /*label: d => d.id,*/
             width: networkGraphWidth,
-            height : windowHeight * 0.7
+            height : networkGraphHeight
         });
         console.log(fakeRoot)
         getTimeStamps(fakeRoot)
@@ -400,7 +402,7 @@
         width = 640, // outer width, in pixels
         height, // outer height, in pixels
         r = maxRadius, // radius of nodes
-        padding = 0, // horizontal padding for first and last column
+        padding = 0.25, // horizontal padding for first and last column
         fill = "#999", // fill for nodes
         fillOpacity = "0.8", // fill opacity for nodes
         stroke = "#555", // stroke for links
@@ -657,7 +659,7 @@
         let height = d.source.y; // this would be the same for the two points since they are in the same level
         return ['M', height, start,    // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
             'A',                            // This means we're gonna build an elliptical arc
-            (start - end)/3, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
+            (start - end)/4, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
             (start - end)/2, 0, 0, ',',
             start < end ? 1 : 0, height, ',', end] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
             .join(' ');
@@ -841,7 +843,7 @@
     function drawBarSvg(){
         // let width = document.getElementById('bar_chart_div').clientWidth
         // let height = document.getElementById('bar_chart_div').clientHeight
-        let width = networkGraphWidth;//document.getElementById('bar_chart_div').clientWidth
+        let width = sidebarWidth;//document.getElementById('bar_chart_div').clientWidth
         let height = barGraphHeight;//document.getElementById('bar_chart_div').clientHeight
 
         console.log(width+" "+height)
@@ -856,13 +858,13 @@
     }
 
     function drawBars(originalData, data, svg){
-        let width = networkGraphWidth;//document.getElementById('bar_chart_div').clientWidth
+        let width = sidebarWidth;//document.getElementById('bar_chart_div').clientWidth
         let height = barGraphHeight;//document.getElementById('bar_chart_div').clientHeight
 
         let xVal = d => d.xLabel
         let yVal = d => d.count
 
-        let margin = {top: height*0.1, bottom: height*0.5, left: width*0.2, right: width*0.2}
+        let margin = {top: height*0.1, bottom: height*0.5, left: width*0.1, right: width*0.1}
         let innerWidth = width - margin.left - margin.right
         let innerHeight = height - margin.top - margin.bottom
 
