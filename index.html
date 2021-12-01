@@ -55,14 +55,14 @@
         pointer-events: none;
     }
     #complete_viz {
-        display: inline-block;
+        display: grid;
         height: 100vh;
         max-height: 100vh;
-        /*grid-template-columns: 1fr;
-        grid-template-rows: .7fr 0.1fr .3fr;*/
+        /*grid-template-columns: 1fr;*/
+        grid-template-rows: .7fr .3fr; 
     }
     #viz {
-        /*overflow: scroll;*/
+        /* overflow: scroll; */
         position: relative;
     }
     #legend {
@@ -164,6 +164,11 @@
         user-select: none;
     }
 
+    #bar_chart_div{
+        margin-top: 20px;
+        margin-bottom: 0;
+    }
+
     #goBackButton{
         margin: 0;
         position: relative;
@@ -188,145 +193,159 @@
     #complete_tool{
         display: grid;
         grid-template-columns: 1fr 2fr;
+        overflow: scroll;
+    }
+
+    #barchart_side_bar{
+        display: grid;
+        grid-template-rows: 0.2fr 0.8fr;
+        overflow: scroll;
+    }
+
+    #levelBar{
+        margin-top: 50px;
     }
 
 
 </style>
 <div id='complete_tool'>
-<div class="sidebar" id="sidebarTool">
-    <div class="vizOptionsContainer">
-        <div>Use divergent coloring on</div>
-        <div class="networkVizOptions">
-            <div class="singleOption">
-                <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
-                <label for="treeEdgeColoring">tree edges</label>
-            </div>
-            <div class="singleOption">
-                <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
-                <label for="extraEdgeAcrossColoring">non-tree edges within the same level</label>
-            </div>
-            <div class="singleOption">
-                <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
-                <label for="extraEdgeAcrossColoring">non-tree edges across different levels</label>
-            </div>
-        </div>
-    </div>
-    <div class="vizOptionsContainer">
-        <div>Vary node size by</div>
-        <div class="networkVizOptions">
-            <div class="singleOption">
-                <input type="radio" id="incomingEdges" name="nodeSizeAttribute" value="incomingEdges" onclick="updateNodeSizeAttribute(this)">
-                <label for="incomingEdges">number of incoming edges</label>
-            </div>
-            <div class="singleOption">
-                <input type="radio" id="outgoingEdges" name="nodeSizeAttribute" value="outgoingEdges" onclick="updateNodeSizeAttribute(this)">
-                <label for="outgoingEdges">number of outgoing edges</label>
-            </div>
-            <div class="singleOption">
-                <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
-                <label for="numLikes">number of likes</label>
-            </div>
-            <div class="singleOption">
-                <input type="radio" id="numComments" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
-                <label for="numComments">number of comments</label>
-            </div>
-            <div class="singleOption">
-                <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
-                <label for="likesCommentsRatio">comments / likes</label>
-            </div>
-            <div class="singleOption">
-                <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
-                <label for="uniformNodeSize">use uniform size</label>
-            </div>
-        </div>
-    </div>
-    <div class="vizOptionsContainer">
-        <p>Click on a non-leaf node to select it, and then click the button below to collapse or expand the node</p>
-        <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a node to collapse</button>
-    </div>
-    <div class="vizOptionsContainer">
-        <p>The selected node's information is displayed below</p>
-        <div id="tooltip">
-            <div class="attributeContainer">
-                <div class="attributeLabel">Node ID:</div>
-                <div class="attributeValue" id="idField">###</div>
-            </div>
-            <div class="attributeContainer">
-                <div class="attributeLabel">Timestamp:</div>
-                <div class="attributeValue" id="timestampField">###</div>
-            </div>
-            <div class="attributeContainer">
-                <div class="attributeLabel">Number of Likes:</div>
-                <div class="attributeValue" id="numLikesField">###</div>
-            </div>
-            <div class="attributeContainer">
-                <div class="attributeLabel">Number of Comments:</div>
-                <div class="attributeValue" id="numCommentsField">###</div>
-            </div>
-            <div class="attributeContainer">
-                <div class="attributeLabel">Degree of Contribution:</div>
-                <div class="attributeValue" id="degContributionField">###</div>
-            </div>
-        </div>
-    </div>
-
-    <div id='bar_chart_div'>
-        <div id="bar_chart_viz"></div>
-        <div id="bar_chart_controls">
-            <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
-        </div>
-    </div>
-</div>
-<div id="complete_viz">
-<!-- Create a div where the graph will take place -->
-    <div id="viz">
-        <svg id="network">
-            <defs>
-                <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                </linearGradient>
-                <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                </linearGradient>
-                <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                </linearGradient>
-                <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-                </linearGradient>
-                <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
-                    <rect class="checker" x="0" width="2" height="2" y="0"/>
-                    <rect class="checker" x="2" width="2" height="2" y="2"/>
-                </pattern>
-            </defs>
-        </svg>
-        <div id="legend">
-            <div style="text-align: center;">Legend</div>
-            <div class="legendItem">
-                <div class="graphicWrapper">
-                    <div class="legendGraphic" id="nodeLegend"></div>
+    <div id="barchart_side_bar">
+        <div class="sidebar" id="sidebarTool">
+            <div class="vizOptionsContainer">
+                <div>Use divergent coloring on</div>
+                <div class="networkVizOptions">
+                    <div class="singleOption">
+                        <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
+                        <label for="treeEdgeColoring">tree edges</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
+                        <label for="extraEdgeAcrossColoring">non-tree edges within the same level</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
+                        <label for="extraEdgeAcrossColoring">non-tree edges across different levels</label>
+                    </div>
                 </div>
-                <div class="legendText">A user who has posted the viral hashtag</div>
             </div>
-            <div class="legendItem">
-                <div class="graphicWrapper">
-                    <div class="legendGraphic" id="followerLegend"></div>
+            <div class="vizOptionsContainer">
+                <div>Vary node size by</div>
+                <div class="networkVizOptions">
+                    <div class="singleOption">
+                        <input type="radio" id="incomingEdges" name="nodeSizeAttribute" value="incomingEdges" onclick="updateNodeSizeAttribute(this)">
+                        <label for="incomingEdges">number of incoming edges</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="radio" id="outgoingEdges" name="nodeSizeAttribute" value="outgoingEdges" onclick="updateNodeSizeAttribute(this)">
+                        <label for="outgoingEdges">number of outgoing edges</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
+                        <label for="numLikes">number of likes</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="radio" id="numComments" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
+                        <label for="numComments">number of comments</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
+                        <label for="likesCommentsRatio">comments / likes</label>
+                    </div>
+                    <div class="singleOption">
+                        <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
+                        <label for="uniformNodeSize">use uniform size</label>
+                    </div>
                 </div>
-                <div class="legendText">End of edge connected to the user following another user</div>
             </div>
-            <div class="legendItem">
-                <div class="graphicWrapper">
-                    <div class="legendGraphic" id="followedLegend"></div>
+            <div class="vizOptionsContainer">
+                <p>Click on a non-leaf node to select it, and then click the button below to collapse or expand the node</p>
+                <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a node to collapse</button>
+            </div>
+            <div class="vizOptionsContainer">
+                <p>The selected node's information is displayed below</p>
+                <div id="tooltip">
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Node ID:</div>
+                        <div class="attributeValue" id="idField">###</div>
+                    </div>
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Timestamp:</div>
+                        <div class="attributeValue" id="timestampField">###</div>
+                    </div>
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Number of Likes:</div>
+                        <div class="attributeValue" id="numLikesField">###</div>
+                    </div>
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Number of Comments:</div>
+                        <div class="attributeValue" id="numCommentsField">###</div>
+                    </div>
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Degree of Contribution:</div>
+                        <div class="attributeValue" id="degContributionField">###</div>
+                    </div>
                 </div>
-                <div class="legendText">End of edge connected to the user being followed</div>
+            </div>  
+        </div>
+        <div id='bar_chart_div'>
+            <div id="bar_chart_viz"></div>
+            <div id="bar_chart_controls">
+                <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
             </div>
         </div>
     </div>
-</div>
+    <div id="complete_viz">
+    <!-- Create a div where the graph will take place -->
+        <div id="viz">
+            <svg id="network">
+                <defs>
+                    <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    </linearGradient>
+                    <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
+                        <rect class="checker" x="0" width="2" height="2" y="0"/>
+                        <rect class="checker" x="2" width="2" height="2" y="2"/>
+                    </pattern>
+                </defs>
+            </svg>
+            <div id="legend">
+                <div style="text-align: center;">Legend</div>
+                <div class="legendItem">
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic" id="nodeLegend"></div>
+                    </div>
+                    <div class="legendText">A user who has posted the viral hashtag</div>
+                </div>
+                <div class="legendItem">
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic" id="followerLegend"></div>
+                    </div>
+                    <div class="legendText">End of edge connected to the user following another user</div>
+                </div>
+                <div class="legendItem">
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic" id="followedLegend"></div>
+                    </div>
+                    <div class="legendText">End of edge connected to the user being followed</div>
+                </div>
+            </div>
+        </div>
+        <div id="levelBar">
+        </div>
+    </div>
 </div>
 
 <script>
@@ -336,7 +355,7 @@
     var networkGraphWidth = document.getElementById('complete_viz').clientWidth////windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
     var windowHeight = window.innerHeight;
     var networkGraphHeight = document.getElementById('complete_viz').clientHeight - 20;//windowHeight * 0.95;
-    var barGraphHeight = windowHeight * 0.3;
+    var barGraphHeight = document.getElementById('bar_chart_div').clientHeight//windowHeight * 0.3;
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
@@ -351,6 +370,9 @@
     let updatableData = []
     let curr_time_measures = {}
     let xAxisLabel = ""
+
+    /*level bar variables*/
+    let nodesPerLevel = []
 
     /* svg variables */
     var svg = d3.select("#viz").select("svg");
@@ -384,6 +406,7 @@
         });
         console.log(fakeRoot)
         getTimeStamps(fakeRoot)
+        drawLevelBars(fakeRoot)
     });
     // Copyright 2021 Observable, Inc.
     // Released under the ISC license.
@@ -840,6 +863,35 @@
         // }, 3000)
     }
 
+    function setNodesPerLevel(sourceData){
+        let levelMap = new Map()
+        tree = d3.hierarchy(sourceData)
+        tree.eachBefore(node =>{
+            if(levelMap.has(node.depth)){
+                count = levelMap.get(node.depth)
+                levelMap.set(node.depth, count+1)
+            }else{
+                levelMap.set(node.depth, 1)
+            }
+        })
+
+        nodesPerLevel.length = 0
+        levelMap.forEach((value, key)=>{
+            if(key !== 0){
+                nodesPerLevel.push(
+                    {
+                        "level": key,
+                        "count": value
+                    }
+                )                                       
+            }
+        })
+
+        nodesPerLevel.sort((a,b)=>a.count - b.count)
+        nodesPerLevel.map(node => node.rank = nodesPerLevel.indexOf(node)+1)
+        
+    }
+
     function drawBarSvg(){
         // let width = document.getElementById('bar_chart_div').clientWidth
         // let height = document.getElementById('bar_chart_div').clientHeight
@@ -996,10 +1048,17 @@
 
             g.append('text')
                 .attr('x', innerWidth/2)
-                .attr('y', innerHeight+margin.bottom*0.8)
+                .attr('y', innerHeight+margin.bottom*0.6)
                 .style('fill','black')
                 .attr("text-anchor","middle")
                 .text(`${xAxisLabel}`)
+
+            g.append('text')
+                .attr('x', innerWidth/2)
+                .attr('y', -margin.top*0.5)
+                .style('fill','black')
+                .attr("text-anchor","middle")
+                .text("Number of posts by the time of post")
 
     }
 
@@ -1193,6 +1252,37 @@
             .duration(500)		
             .style("opacity", 0);
         drawBars(timestamps, updatableData, bar_svg)
+    }
+
+    function drawLevelBars(levelData){
+        setNodesPerLevel(levelData)
+        let width = document.getElementById('complete_viz').clientWidth-160
+        let height = 30;//document.getElementById('bar_chart_div').clientHeight
+        let widthPerRect = width/nodesPerLevel.length
+
+        console.log(width+" "+height)
+
+        let svg = d3.select("#levelBar")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr('id', 'time_bars')
+
+        let levelBar = svg.selectAll('rect').data(nodesPerLevel, d=>d.level)
+
+        let totalLevels = nodesPerLevel.length
+
+        console.log(nodesPerLevel)
+
+        levelBar.enter().append('rect')
+            .attr('x', d=>80+(d.level-1)*widthPerRect)
+            .attr('y', 0)
+            .attr('width',widthPerRect)
+            .attr('height', height)
+            .style('fill', 'darkblue')
+            .style('opacity', d=>d.rank/totalLevels)
+            .attr('stroke', 'black')
+
     }
 
 </script>
