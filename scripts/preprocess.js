@@ -99,7 +99,7 @@ function transformToNested(nodeData) {
             fakeRootNode.children.push(nodeData[i]);
         }
     }
-    fakeRootNode.children.sort((a, b) => a.timestamp - b.timestamp);
+    //fakeRootNode.children.sort((a, b) => a.timestamp - b.timestamp);
     return fakeRootNode;
 }
 function computeDegreeOfContributionForAllNodes(nodeData, nodeLookup) {
