@@ -1,0 +1,108 @@
+{
+    "nodes": [
+        {
+            "tweet": "We \u2764\ufe0f @taylorswift13. @taylornation13 #TaylorSwift #AllTooWell https://t.co/XbJLYTJaKc",
+            "id": 153990152,
+            "timestamp": 1638667785000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 1370,
+            "numFollowings": 3769
+        },
+        {
+            "tweet": "An upgrade for my shop products! Laminated stickers, Art Prints and bookmarks!\nShop your #RedTaylorsVersion on Etsy\u2026 https://t.co/U4zmt9ZTFi",
+            "id": 1045628149973704704,
+            "timestamp": 1638667673000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 491,
+            "numFollowings": 527
+        },
+        {
+            "tweet": "RT @Votingnation13: Can we get 200 replies here using:\n\nI Vote #willow 90s remix for #RemixDelA\u00f1o -  #AllTooWell for #mejorvideotrama - #ev\u2026",
+            "id": 1299153505538641920,
+            "timestamp": 1638667593000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 2845,
+            "numFollowings": 2261
+        },
+        {
+            "tweet": "RT @TopTenOfficial: \ud83d\udea8| TOP TEN MUSICAL AWARDS 2021 \n#MejorVideoTrama \n\n\u2714  #AllTooWell FILM - #TaylorSwift \n\u2714  #BeWithMe - #DIMASH\n\nVOTA con\u2026",
+            "id": 167571174,
+            "timestamp": 1638667544000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 2608,
+            "numFollowings": 4981
+        },
+        {
+            "tweet": "RT @radlcIes: #BTS_Butter #ButterHolidayRemix #swifties #AllTooWellTenMinuteVersion #alltoowell #TaylorSwift DO SOMETHING",
+            "id": 1067868756494434305,
+            "timestamp": 1638667530000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 379,
+            "numFollowings": 374
+        },
+        {
+            "tweet": "#BTS_Butter #ButterHolidayRemix #swifties #AllTooWellTenMinuteVersion #alltoowell #TaylorSwift DO SOMETHING",
+            "id": 1278471616058490880,
+            "timestamp": 1638667418000,
+            "numLikes": 12,
+            "numComments": 1,
+            "numFollowers": 2988,
+            "numFollowings": 530
+        },
+        {
+            "tweet": "RT @VoteForTaylor31: Este tweet puede llegar a los 200 comentarios? usando:\n\nI Vote #willow 90s remix for #RemixDelA\u00f1o -  #AllTooWell for #\u2026",
+            "id": 1145708836633710592,
+            "timestamp": 1638667265000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 934,
+            "numFollowings": 507
+        },
+        {
+            "tweet": "And I know it\u2019s long gone and that magic\u2019s not here no more and I might be ok but I\u2019m not fine at all #AllTooWell",
+            "id": 298196668,
+            "timestamp": 1638667044000,
+            "numLikes": 0,
+            "numComments": 0,
+            "numFollowers": 107,
+            "numFollowings": 262
+        },
+        {
+            "tweet": "\ud83c\udfb6 | Make sure to stream #AllTooWell from Spotify's \"Today's Top Hits\" playlist! https://t.co/rwWBTJK17S",
+            "id": 1439083905437642755,
+            "timestamp": 1638667031000,
+            "numLikes": 1,
+            "numComments": 0,
+            "numFollowers": 192,
+            "numFollowings": 96
+        },
+        {
+            "tweet": "\ud83d\udea8| TOP TEN MUSICAL AWARDS 2021 \n#MejorVideoTrama \n\n\u2714  #AllTooWell FILM - #TaylorSwift \n\u2714  #BeWithMe - #DIMASH\n\nVOTA\u2026 https://t.co/FcuqYVmwF8",
+            "id": 1351275324,
+            "timestamp": 1638666725000,
+            "numLikes": 7,
+            "numComments": 1,
+            "numFollowers": 26427,
+            "numFollowings": 110
+        }
+    ],
+    "links": [
+        {
+            "source": 167571174,
+            "target": 1351275324
+        },
+        {
+            "source": 1067868756494434305,
+            "target": 1278471616058490880
+        },
+        {
+            "source": 1278471616058490880,
+            "target": 1067868756494434305
+        }
+    ]
+}
