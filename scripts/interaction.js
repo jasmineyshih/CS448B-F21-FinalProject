@@ -487,3 +487,7 @@ function goBack(e){
         .style("opacity", 0);
     drawBars(timestamps, updatableData, bar_svg)
 }
+
+function zoom(event) {
+    d3.select("#network").selectAll("g").attr("transform", event.transform);
+}

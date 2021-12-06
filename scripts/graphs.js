@@ -61,7 +61,11 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("transform", `translate(-${dy}, 0)`)
         .attr("style", "height: 100%;")
         .attr("font-family", "sans-serif")
-        .attr("font-size", 10);
+        .attr("font-size", 10)
+        .call(d3.zoom()
+            .translateExtent([[-dy * padding / 2, x0 - dx], [totalWidth, height * height_mult]])
+            .scaleExtent([1, 8])
+            .on("zoom", zoom));
     
     /* draw level bars here since the level bars svg needs to match the size of the network graph svg */
     setNodesPerLevel(root)
