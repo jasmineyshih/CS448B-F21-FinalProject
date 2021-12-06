@@ -41,13 +41,17 @@ for i in range(start_index-1, end_index):
     followers = tweepy.Cursor(api.get_follower_ids, user_id = id).items()
     followers_list = []
 
+    count_scraped = 0
     got_followers = False
     while not got_followers:
         try:
-            followers_list=list(followers)
+            for follower in followers:
+                followers_list.append(follower)
+                count_scraped += 1
+            # followers_list=list(followers)
             got_followers = True
         except:
-            print("API error, waiting before next request . . .")
+            print("API error, waiting before next request (scraped "+str(count_scraped)+" followers of serial no: " + str(serial)+") . . .")
             time.sleep(60)
 
     data = {
