@@ -1,0 +1,203 @@
+body {
+    margin: 5px;
+}
+.sidebar {
+    font-family: 'Montserrat', sans-serif;
+    width: auto;
+    display: inline-block;
+    background: #dddddd;
+    border: 2px solid black;
+    border-radius: 5px;
+    height: fit-content;
+}
+.vizOptionsContainer {
+    margin: 10px;
+    padding: 5px;
+    font-size: 12px;
+}
+.vizOptionsContainer button {
+    font-size: 12px;
+}
+.vizOptionsContainer button:disabled {
+    opacity: 1;
+}
+.vizOptionsContainer p {
+    margin: 0 0 5px 0;
+    font-size: 10px;
+    font-style: italic;
+}
+.singleOption {
+    display: flex;
+    margin: 2px 0px;
+}
+.singleOption label {
+    margin-left: 3px;
+}
+#tooltip {		
+    text-align: left;			
+    width: auto;				
+    height: auto;					
+    padding: 5px 10px;				
+    font-size: 12px;		
+    background: lightsteelblue;		
+    pointer-events: none;
+}
+#complete_viz {
+    display: grid;
+    height: 100vh;
+    max-height: 100vh;
+    /*grid-template-columns: 1fr;*/
+    /*grid-template-rows: 9fr 1fr; */
+}
+#viz {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    display: grid;
+}
+#legend {
+    opacity: 0.8;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: white;
+    border: 2px solid black;
+    border-radius: 4px;
+    padding: 0.5em;
+    margin: 0.5em;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    text-align: left;
+    width: 360px;
+}
+.graphicWrapper {
+    width: 3em;
+    height: 100%;
+    float: left;
+}
+#nodeLegend {
+    margin: auto;
+    height: 1em;
+    width: 1em;
+    background-color: #999;
+    border-radius: 50%;
+}
+#followerLegend {
+    width: 1.5em;
+    height: 0.2em;
+    margin: 0.5em 0.5em 0.3em auto;
+    background-color: blue;
+}
+#followedLegend {
+    width: 1.5em;
+    height: 0.2em;
+    margin: 0.5em 0.5em 0.3em auto;
+    background-color: red;
+}
+.fakeRootElements {
+    visibility: hidden;
+}
+.selectedNode {
+    stroke: black !important;
+    stroke-width: 2px;
+    fill-opacity: 1;
+}
+.collapsedNode {
+    stroke: #999;
+    fill: url(#patternCheckers);
+    stroke-width: 2px;
+    fill-opacity: 1;
+}
+.checker {
+    fill: #777;
+}
+.dimmedEdges {
+    stroke-opacity: 0.1;
+}
+.highlightedEdges {
+    stroke-opacity: 0.8;
+}
+.showButton {
+    visibility: visible !important;
+}
+.hiddenNodes {
+    visibility: hidden !important;
+}
+.hiddenEdges {
+    visibility: hidden !important;
+}
+div.tooltipBars {	
+    position: absolute;			
+    text-align: center;				
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: #3F51B5;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;
+    overflow: hidden;
+    color: white;
+    font-weight:600;
+    font-family: Open Sans;			
+}
+.attributeContainer {
+    width: 100%;
+}
+.attributeLabel {
+    width: 80px;
+    display: inline;
+}
+.attributeValue {
+    display: inline;
+}
+
+#bar_chart_viz {
+    user-select: none;
+}
+
+#bar_chart_div{
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+#goBackButton{
+    margin: 0;
+    position: relative;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    background-color: darkblue;
+    border: none;
+    color: white;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+button:disabled {
+    opacity: 0.3;
+}
+
+#complete_tool{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    overflow: scroll;
+}
+
+#barchart_side_bar{
+    display: grid;
+    grid-template-rows: 0.2fr 0.8fr;
+    overflow: scroll;
+}
+
+#levelBar {
+    overflow: hidden;
+}
+#levelBarContainer {
+    margin-top: 10px;
+    width: 100%;
+    overflow: hidden;
+}
