@@ -31,7 +31,7 @@ cursor = tweepy.Cursor(api.get_friend_ids, user_id = 1145708836633710592).items(
 start_index = int(sys.argv[1])
 end_index = int(sys.argv[2])
 
-users_json = open("user_ids.json")
+users_json = open("user_ids_excpt_RT.json")
 users = json.load(users_json)
 
 for i in range(start_index-1, end_index):
