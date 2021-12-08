@@ -1,4 +1,48 @@
-function preprocessData(nodeData, linkData, nodeLookup) {
+function preprocessData(nodeData, nodeLookup) {
+    nodeData.forEach(function (nodeObj) {
+        nodeObj.directParent = null;
+        nodeObj.parents = [];
+        nodeObj.allChildren = [];
+        nodeObj.children = [];
+        nodeObj.otherFollowers = [];
+        nodeObj.otherFollowing = [];
+        nodeObj.level = -1;
+        // format a time string based on timestamp value
+        let datetime = new Date(nodeObj.timestamp)
+        let date = datetime.getDate()
+        let month = datetime.getMonth()
+        let year = datetime.getFullYear()
+        let hour = datetime.getHours()
+        let min = datetime.getMinutes()
+        let seconds = datetime.getSeconds()
+        nodeObj.timeString = `${month + 1}/${date} ${hour}:${min}:${seconds}`;
+
+        nodeLookup[nodeObj.id] = nodeObj;   // add node to lookup map for quick access later
+    });
+    nodeData.sort((a, b) => a.timestamp - b.timestamp);
+    let nodeDataMap = new Map();
+    let children = new Map();
+    let parents = new Map();
+
+    nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
+    nodeData.forEach(followedNode => {
+        followedNode.followers.forEach(follower => {
+            let followerNode = nodeDataMap.get(follower);
+            // TODO: remove the first condition after we have the complete set of data
+            if (followerNode && followedNode.timestamp < followerNode.timestamp) {  // this relationship is only meaningful if the followed user made a post ealier than the follower
+                followerNode.parents.push(followedNode.id); // add the followed node as a parent of the follower
+                followedNode.allChildren.push(followerNode.id); // add the follower as a child of the followed node
+            }
+        });
+    });
+    console.log(nodeDataMap);
+    levelize(nodeDataMap);
+    setDirectParentChildren(nodeDataMap);
+    sortChildren(nodeDataMap);
+
+}
+//below function is for processing input file that has nodes and links in seperate lists
+/*function preprocessData_old(nodeData, linkData, nodeLookup) {
     nodeData.forEach(function (nodeObj) {
         nodeObj.directParent = null;
         nodeObj.parents = [];
@@ -38,7 +82,7 @@ function preprocessData(nodeData, linkData, nodeLookup) {
     setDirectParentChildren(nodeDataMap);
     sortChildren(nodeDataMap);
 
-}
+}*/
 function levelize(nodeMap){
     nodeMap.forEach((node, id, map) => {
         if (node.level === -1){

@@ -196,16 +196,18 @@
 
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
-    var linkData;   // list of links
+    // TODO: delete var linkData;   // list of links
     var nodeLookup = {};    // maps node id to node object for easy lookup
     var fakeRoot;   // used to store all level 0 nodes as children for easier drawing
     var tree;   // used to store all level 0 nodes as children for easier drawing
     
-    d3.json("data/nodesAndLinks.json").then(function(data) {
-        nodeData = data.nodes;
-        linkData = data.links;
-        preprocessData(nodeData, linkData, nodeLookup);   // transform data into the format we want
-        nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
+    d3.json("data/users_with_tweet_and_followers.json").then(function(data) {
+        // TODO: delete nodeData = data.nodes;
+        // TODO: delete linkData = data.links;
+        console.log(data);
+        nodeData = data;
+        preprocessData(nodeData, nodeLookup);   // transform data into the format we want
+        //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
         computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);

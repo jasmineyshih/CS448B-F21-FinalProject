@@ -64,7 +64,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("font-size", 10)
         .call(d3.zoom()
             .translateExtent([[-dy * padding / 2, x0 - dx], [totalWidth, height * height_mult]])
-            .scaleExtent([1, 8])
+            .scaleExtent([1, 24])
             .on("zoom", zoom));
     
     /* draw level bars here since the level bars svg needs to match the size of the network graph svg */
@@ -339,7 +339,7 @@ function drawBars(originalData, data, svg){
             tooltipBars.transition()		
                 .duration(500)		
                 .style("opacity", 0);
-            d3.selectAll('rect')
+            svg.selectAll('rect')
                 .style("fill", 'steelblue')
             d3.select(`#data${d.id}`)
                 .style("fill", 'red')
@@ -350,7 +350,7 @@ function drawBars(originalData, data, svg){
 
         svg.on("click", function(e){
             deselectSelectedNodes()
-            d3.selectAll('rect')
+            svg.selectAll('rect')
                 .style("fill", 'steelblue')
                 .style("opacity", '0.8')
         })
