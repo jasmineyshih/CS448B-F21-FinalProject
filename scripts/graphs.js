@@ -339,7 +339,7 @@ function drawBars(originalData, data, svg){
             tooltipBars.transition()		
                 .duration(500)		
                 .style("opacity", 0);
-            d3.selectAll('rect')
+            svg.selectAll('rect')
                 .style("fill", 'steelblue')
             d3.select(`#data${d.id}`)
                 .style("fill", 'red')
@@ -350,7 +350,7 @@ function drawBars(originalData, data, svg){
 
         svg.on("click", function(e){
             deselectSelectedNodes()
-            d3.selectAll('rect')
+            svg.selectAll('rect')
                 .style("fill", 'steelblue')
                 .style("opacity", '0.8')
         })
