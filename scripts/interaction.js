@@ -490,4 +490,5 @@ function goBack(e){
 
 function zoom(event) {
     d3.select("#network").selectAll("g").attr("transform", event.transform);
+    d3.select("#levelBar").selectAll("rect").attr("transform", `translate(${event.transform.x},0) scale(${event.transform.k})`);
 }
