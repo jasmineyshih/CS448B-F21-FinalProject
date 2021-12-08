@@ -7,7 +7,7 @@ tweet_by_user_id_dict = {}
 for tweet in all_tweets:
     tweet_by_user_id_dict[tweet["id"]] = tweet
 
-scraped_users_json = open("../data/users_with_relevant_followers_part2.json")
+scraped_users_json = open("../data/users_with_relevant_followers.json")
 scraped_users = json.load(scraped_users_json)
 
 users_with_followers_list = []
@@ -17,5 +17,5 @@ for user in scraped_users:
     tweetObj["followers"] = user["followers"]
     users_with_followers_list.append(tweetObj)
   
-with open("../data/users_with_tweet_and_followers.json", 'w') as outfile:
+with open("../data/users_with_tweet_and_followers_part1.json", 'w') as outfile:
   json.dump(users_with_followers_list, outfile, indent=4)
