@@ -16,7 +16,7 @@ function preprocessData(nodeData, nodeLookup) {
         let min = datetime.getMinutes()
         let seconds = datetime.getSeconds()
         nodeObj.timeString = `${month + 1}/${date} ${hour}:${min}:${seconds}`;
-
+        
         nodeLookup[nodeObj.id] = nodeObj;   // add node to lookup map for quick access later
     });
     nodeData.sort((a, b) => a.timestamp - b.timestamp);
@@ -24,10 +24,9 @@ function preprocessData(nodeData, nodeLookup) {
     let children = new Map();
     let parents = new Map();
 
-    nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
     nodeData.forEach(followedNode => {
         followedNode.followers.forEach(follower => {
-            let followerNode = nodeDataMap.get(follower);
+            let followerNode = nodeLookup[follower];
             // TODO: remove the first condition after we have the complete set of data
             if (followerNode && followedNode.timestamp < followerNode.timestamp) {  // this relationship is only meaningful if the followed user made a post ealier than the follower
                 followerNode.parents.push(followedNode.id); // add the followed node as a parent of the follower
@@ -35,11 +34,24 @@ function preprocessData(nodeData, nodeLookup) {
             }
         });
     });
-    console.log(nodeDataMap);
+    let loneNodeList = [];
+    let nodeListLength = nodeData.length;
+    let currIndex = 0;
+    while (currIndex < nodeListLength) {
+        let currNode = nodeData[currIndex];
+        if (currNode.parents.length == 0 && currNode.allChildren.length == 0) {
+            let removedList = nodeData.splice(currIndex, 1);  // remove node from list, decrease total length, and add removed node to lone node list
+            nodeListLength--;
+            loneNodeList.push(removedList[0]);
+        } else {
+            currIndex++;
+        }
+    }
+    nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
     levelize(nodeDataMap);
     setDirectParentChildren(nodeDataMap);
     sortChildren(nodeDataMap);
-
+    return loneNodeList;    // return the node list with lone nodes filtered out
 }
 //below function is for processing input file that has nodes and links in seperate lists
 /*function preprocessData_old(nodeData, linkData, nodeLookup) {
