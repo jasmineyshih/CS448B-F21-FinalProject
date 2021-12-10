@@ -286,11 +286,10 @@ function updateTree() {
                 return exit.remove();
             }
         );
-}
-
-function drawTimestampBarChart(treeHierarchy){
-    treeHierarchy.eachBefore(node =>{
-        time = node.data.timestamp
+    /* update timestamp bar chart */
+    timestamps.length = 0;
+    nodeData.forEach(node =>{
+        let time = node.timestamp;
         if (time !== undefined){
             let datetime = new Date(time)
             let date = datetime.getDate()
@@ -308,14 +307,60 @@ function drawTimestampBarChart(treeHierarchy){
                     'hour': hour,
                     'min': min,
                     'seconds': seconds,
-                    'nodeId': node.data.id
+                    'nodeId': node.id
+                }
+            )
+        }
+    });
+    console.log(updatableData);
+    console.log(curr_time_measures.measure)
+    if (curr_time_measures.measure === "day"){
+        getTimeStampByDate(timestamps, updatableData)
+    } else if (curr_time_measures.measure === "hour"){
+        getTimeStampByHour(timestamps, updatableData, curr_time_measures.date,curr_time_measures.month, curr_time_measures.year)
+    } else if (curr_time_measures.measure === "min"){
+        getTimeStampByMinute(timestamps, updatableData, curr_time_measures.hour, curr_time_measures.date,curr_time_measures.month, curr_time_measures.year)
+    }
+    console.log(updatableData);
+    selectedNodesByTimestamps(window.event,updatableData)
+    bar_svg.selectAll('g').remove()
+    d3.select('.tooltipBars').transition()		
+        .duration(500)		
+        .style("opacity", 0);
+    drawBars(timestamps, updatableData, bar_svg)
+}
+
+function drawTimestampBarChart(nodeList){
+    timestamps.length = 0;
+    nodeList.forEach(node =>{
+        time = node.timestamp
+        if (time !== undefined){
+            let datetime = new Date(time)
+            let date = datetime.getDate()
+            let month = datetime.getMonth()
+            let year = datetime.getFullYear()
+            let hour = datetime.getHours()
+            let min = datetime.getMinutes()
+            let seconds = datetime.getSeconds() 
+            timestamps.push(
+                {
+                    'timestamp': time,
+                    'year': year,
+                    'month': month,
+                    'date': date,
+                    'hour': hour,
+                    'min': min,
+                    'seconds': seconds,
+                    'nodeId': node.id
                 }
             )
         }
     })
 
     //nodeData is already sorted with respect to timestamp. So, timestamp is sorted too
+    curr_time_measures = {measure: "day"};
     getTimeStampByDate(timestamps, updatableData)
+    console.log(updatableData);
     bar_svg = drawBarSvg()
     drawBars(timestamps, updatableData, bar_svg)
     // setInterval(()=>{
@@ -391,7 +436,6 @@ function drawBars(originalData, data, svg){
     // console.log(svgBox)
 
     let dataBars = g.selectAll('rect').data(data, d=>d.id)
-
     dataBars.enter().append('rect').merge(dataBars)
         .attr('x', d => xScale(xVal(d)))
         .attr('width', xScale.bandwidth())
@@ -426,7 +470,7 @@ function drawBars(originalData, data, svg){
                 curr_time_measures = {measure: "hour", date: timestamp.date, month: timestamp.month,year: timestamp.year}
             }else if(d.measure === "hour"){
                 getTimeStampByMinute(timestamps, data, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
-                curr_time_measures = {measure: "min", date: timestamp.date, month: timestamp.month,year: timestamp.year}
+                curr_time_measures = {measure: "min", hour: timestamp.hour, date: timestamp.date, month: timestamp.month,year: timestamp.year}
             }
             selectedNodesByTimestamps(e,data)
             svg.selectAll('g').remove()
