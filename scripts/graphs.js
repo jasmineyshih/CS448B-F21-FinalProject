@@ -2,7 +2,7 @@
 // Released under the ISC license.
 // https://observablehq.com/@d3/tree
 // Modified to suit our needs
-function Tree(data, { // data is in hierarchy (nested objects) form
+function Tree(data, svg, levelBarContainer, levelBarSvg, id_tag, { // data is in hierarchy (nested objects) form
     id = Array.isArray(data) ? d => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
     parentId = Array.isArray(data) ? d => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
     children, // if hierarchical data, given a d in data, returns its children
@@ -74,9 +74,9 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .style("opacity", 0);
 
     setNodesPerLevel(root)
-    d3.select("#levelBarContainer")
+    levelBarContainer
         .style("height", levelGraphHeight + "px");
-    let levelBarSvg = d3.select("#levelBar")
+    levelBarSvg 
         .attr("viewBox", [-dy * padding / 2, 0, totalWidth, height*height_mult])
         .attr("width", totalWidth)
         .attr("height", height)

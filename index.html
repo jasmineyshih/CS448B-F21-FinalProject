@@ -158,6 +158,36 @@
                 </div>
             </div>
         </div>
+        <div id="minMapViz">
+            <svg id="network2">
+                <defs>
+                    <linearGradient id="verticalGradFollowedUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="verticalGradFollowerUp" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="horizontalGradFollowedLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="horizontalGradFollowerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
+                    </linearGradient>
+                    <pattern id="patternCheckers" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse" >
+                        <rect class="checker" x="0" width="2" height="2" y="0"/>
+                        <rect class="checker" x="2" width="2" height="2" y="2"/>
+                    </pattern>
+                </defs>
+            </svg>
+            <div id="levelBarContainer2">
+                <svg id="levelBar2">
+                </svg>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -165,11 +195,11 @@
     /* UI variables */
     var sidebarWidth = document.getElementById('sidebarTool').clientWidth;
     var windowWidth = window.innerWidth;
-    var networkGraphWidth = document.getElementById('complete_viz').clientWidth////windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
+    var networkGraphWidth = document.getElementById('viz').clientWidth////windowWidth - d3.select("#complete_tool").node().getBoundingClientRect().width - 15;
     var nodeWidth;  // this will be set in the tree drawing function
     var windowHeight = window.innerHeight;
     var levelGraphHeight = 30;
-    var networkGraphHeight = document.getElementById('complete_viz').clientHeight - 20 - levelGraphHeight;//windowHeight * 0.95;
+    var networkGraphHeight = document.getElementById('viz').clientHeight - 20 - levelGraphHeight;//windowHeight * 0.95;
     var levelGraphYPos;  // this will be set in the tree drawing function
     var barGraphHeight = document.getElementById('bar_chart_div').clientHeight//windowHeight * 0.3;
     var useGradientOnTreeEdges = true;
@@ -189,9 +219,20 @@
 
     /*level bar variables*/
     let nodesPerLevel = []
+    let levelBar1 = d3.select('#levelBar')
+    let levelBarContainer1 = d3.select('#levelBarContainer')
+
+    let levelBar2 = d3.select('#levelBar2')
+    let levelBarContainer2 = d3.select('#levelBarContainer2')
+    
+    /*Id tags*/
+    let id_tag1 = 1
+    let id_tag2 = 2
 
     /* svg variables */
-    var svg = d3.select("#network");
+    var svg1 = d3.select("#network");
+    var svg2 = d3.select("#network2");
+
     var solidEdgeColor = "#555";
     var minRadius = 1;
     var maxRadius = 2;
@@ -217,13 +258,23 @@
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
         computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);
-        tree = Tree(fakeRoot, {
+        tree = Tree(fakeRoot, svg1, levelBarContainer1, levelBar1, id_tag1, {
             /*label: d => d.id,*/
             sort: (a, b) => a.timestamp - b.timestamp,
             width: networkGraphWidth,
             height: networkGraphHeight,
             r: maxRadius
         });
+
+        tree2 = Tree(fakeRoot, svg2, levelBarContainer2, levelBar2, id_tag2, {
+            /*label: d => d.id,*/
+            sort: (a, b) => a.timestamp - b.timestamp,
+            width: document.getElementById('minMapViz').clientWidth,
+            height: networkGraphHeight,
+            r: maxRadius
+        });
+
+        console.log(document.getElementById('minMapViz').clientHeight - 20 - levelGraphHeight)
         drawTimestampBarChart(tree)
         //drawLevelBars(tree)   /* this is now drawn in the tree function */
         console.log(fakeRoot);
