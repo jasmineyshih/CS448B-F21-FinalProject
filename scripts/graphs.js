@@ -16,10 +16,10 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     height, // outer height, in pixels
     r, // radius of nodes
     padding = 0.5, // horizontal padding for first and last column
-    fill = "#999", // fill for nodes
+    fill = "#000", // fill for nodes
     fillOpacity = "0.8", // fill opacity for nodes
     stroke = "#555", // stroke for links
-    strokeWidth = 2, // stroke width for links
+    strokeWidth = 1, // stroke width for links
     strokeOpacity = 0.35, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
     strokeLinecap, // stroke line cap for links
