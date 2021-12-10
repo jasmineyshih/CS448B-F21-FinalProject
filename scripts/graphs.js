@@ -91,7 +91,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr('y', 0)
         .attr('width', nodeWidth)
         .attr('height', levelGraphHeight)
-        .style('fill', 'darkblue')
+        .style('fill', 'black')
         .style('opacity', d=>d.rank/totalLevels)
         .attr('stroke', 'black')
         .on("mousemove", function(e,d) {
@@ -107,6 +107,15 @@ function Tree(data, { // data is in hierarchy (nested objects) form
                 .duration(500)		
                 .style("opacity", 0);	
             })
+    let level1 = nodesPerLevel.find(level => level.level == 1);
+    levelBarSvg.append("text")
+        .attr('x', level1.xPos - 10)
+        .attr('y', 20)
+        .style('fill','black')
+        .attr("text-anchor","end")
+        .style("font-size", "20px")
+        .text("Rank of number of nodes");
+        
     /* done drawing level bars */
 
     svg.append("g")
@@ -181,6 +190,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     return root;
 }
 function updateTree() {
+    attemptDeselectNodes();
     showLoneNodes = showLoneNodes ? false : true;
     if (showLoneNodes) {
         nodeData = nonLoneNodes.concat(loneNodes);
@@ -301,6 +311,7 @@ function updateTree() {
                 return exit.remove();
             }
         );
+    
     /* update timestamp bar chart */
     timestamps.length = 0;
     nodeData.forEach(node =>{
@@ -402,7 +413,8 @@ function drawBars(originalData, data, svg){
     let xVal = d => d.xLabel
     let yVal = d => d.count
 
-    let margin = {top: height*0.1, bottom: height*0.5, left: width*0.1, right: width*0.1}
+    /*let margin = {top: height*0.1, bottom: height*0.5, left: width*0.1, right: width*0.1}*/
+    let margin = {top: height*0.1, bottom: height*0.375, left: width*0.1, right: 10}
     let innerWidth = width - margin.left - margin.right
     let innerHeight = height - margin.top - margin.bottom
 
@@ -510,7 +522,7 @@ function drawBars(originalData, data, svg){
             svg.selectAll('rect')
                 .style("fill", 'steelblue')
             d3.select(`#data${d.id}`)
-                .style("fill", 'red')
+                .style("fill", 'orange')
         })
 
         dataBars.exit().remove()
@@ -521,11 +533,12 @@ function drawBars(originalData, data, svg){
             svg.selectAll('rect')
                 .style("fill", 'steelblue')
                 .style("opacity", '0.8')
+            e.stopPropagation();
         })
 
         g.append('text')
             .attr('x', innerWidth/2)
-            .attr('y', innerHeight+margin.bottom*0.6)
+            .attr('y', height - margin.bottom/3)
             .style('fill','black')
             .attr("text-anchor","middle")
             .text(`${xAxisLabel}`)
@@ -534,8 +547,9 @@ function drawBars(originalData, data, svg){
             .attr('x', innerWidth/2)
             .attr('y', -margin.top*0.5)
             .style('fill','black')
+            .style('font-size','13px')
             .attr("text-anchor","middle")
-            .text("Number of posts by the time of post")
+            .text("Number of Posts by Post Creation Time")
 
 }
 

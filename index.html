@@ -4,17 +4,18 @@
 <html>
 
 <head>
-<!-- Load d3.js -->
-<script src="https://d3js.org/d3.v6.js"></script>
-<script src="scripts/util.js"></script>
-<script src="scripts/preprocess.js"></script>
-<script src="scripts/interaction.js"></script>
-<script src="scripts/graphs.js"></script>
-<link rel="stylesheet" href="styles.css">
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="scripts/util.js"></script>
+    <script src="scripts/preprocess.js"></script>
+    <script src="scripts/interaction.js"></script>
+    <script src="scripts/graphs.js"></script>
+    <link rel="stylesheet" href="styles.css">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <title>Viral Hashtag Progression Visualizer</title>
 </head>
 
 <body>
@@ -22,6 +23,7 @@
 <div id='complete_tool'>
     <div id="barchart_side_bar">
         <div class="sidebar" id="sidebarTool">
+            <div style="margin: 5px 10px 0px 10px; font-weight: bold;">Control Options for Viral Hashtag Progression Visualizer</div>
             <div class="vizOptionsContainer">
                 <div>Use divergent coloring on</div>
                 <div class="networkVizOptions">
@@ -29,42 +31,56 @@
                         <input type="checkbox" name="treeEdgeColoring" onclick="updateEdgeColors('tree')" checked>
                         <label for="treeEdgeColoring">tree edges</label>
                     </div>
-                    <div class="singleOption">
-                        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
-                        <label for="extraEdgeAcrossColoring">non-tree edges within the same level</label>
-                    </div>
-                    <div class="singleOption">
-                        <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
-                        <label for="extraEdgeAcrossColoring">non-tree edges across different levels</label>
+                    <div class="singleOptionGrid">
+                        <div class="checkboxContainer">
+                            <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraWithin')" checked>
+                            <label for="extraEdgeAcrossColoring">non-tree edges within same level</label>
+                        </div>
+                        <div class="checkboxContainer">
+                            <input type="checkbox" name="extraEdgeAcrossColoring" onclick="updateEdgeColors('extraAcross')" checked>
+                            <label for="extraEdgeAcrossColoring">non-tree edges across levels</label>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="vizOptionsContainer">
                 <div>Vary node size by</div>
                 <div class="networkVizOptions">
-                    <div class="singleOption">
-                        <input type="radio" id="incomingEdges" name="nodeSizeAttribute" value="incomingEdges" onclick="updateNodeSizeAttribute(this)">
-                        <label for="incomingEdges">number of incoming edges</label>
+                    <div class="singleOptionGrid">
+                        <div class="checkboxContainer">
+                            <input type="radio" id="incomingEdges" name="nodeSizeAttribute" value="incomingEdges" onclick="updateNodeSizeAttribute(this)">
+                            <label for="incomingEdges">number of incoming edges</label>
+                        </div>
+                        <div class="checkboxContainer">
+                            <input type="radio" id="outgoingEdges" name="nodeSizeAttribute" value="outgoingEdges" onclick="updateNodeSizeAttribute(this)">
+                            <label for="outgoingEdges">number of outgoing edges</label>
+                        </div>
                     </div>
-                    <div class="singleOption">
-                        <input type="radio" id="outgoingEdges" name="nodeSizeAttribute" value="outgoingEdges" onclick="updateNodeSizeAttribute(this)">
-                        <label for="outgoingEdges">number of outgoing edges</label>
+                    <div class="singleOptionGrid">
+                        <div class="checkboxContainer">
+                            <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
+                            <label for="numLikes">number of likes</label>
+                        </div>
+                        <div class="checkboxContainer">
+                            <input type="radio" id="numComments" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
+                            <label for="numComments">number of retweets</label>
+                        </div>
                     </div>
-                    <div class="singleOption">
-                        <input type="radio" id="numLikes" name="nodeSizeAttribute" value="numLikes" onclick="updateNodeSizeAttribute(this)">
-                        <label for="numLikes">number of likes</label>
+                    <div class="singleOptionGrid">
+                        <div class="checkboxContainer">
+                            <input type="radio" id="numFollowers" name="nodeSizeAttribute" value="numFollowers" onclick="updateNodeSizeAttribute(this)">
+                            <label for="numFollowers">number of total followers</label>
+                        </div>
+                        <div class="checkboxContainer">
+                            <input type="radio" id="degOfContribution" name="nodeSizeAttribute" value="degOfContribution" onclick="updateNodeSizeAttribute(this)">
+                            <label for="degOfContribution">degree of contribution</label>
+                        </div>
                     </div>
-                    <div class="singleOption">
-                        <input type="radio" id="numComments" name="nodeSizeAttribute" value="numComments" onclick="updateNodeSizeAttribute(this)">
-                        <label for="numComments">number of comments</label>
-                    </div>
-                    <div class="singleOption">
-                        <input type="radio" id="likesCommentsRatio" name="nodeSizeAttribute" value="numComments/numLikes" onclick="updateNodeSizeAttribute(this)">
-                        <label for="likesCommentsRatio">comments / likes</label>
-                    </div>
-                    <div class="singleOption">
-                        <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
-                        <label for="uniformNodeSize">use uniform size</label>
+                    <div class="singleOptionGrid">
+                        <div class="checkboxContainer">
+                            <input type="radio" id="uniformNodeSize" name="nodeSizeAttribute" value="" onclick="updateNodeSizeAttribute(this)" checked>
+                            <label for="uniformNodeSize"><b>use uniform size</b></label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -78,40 +94,45 @@
                 </div>
             </div>
             <div class="vizOptionsContainer">
-                <p>Click on a non-leaf node to select it, and then click the button below to collapse or expand the node</p>
-                <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a node to collapse</button>
-                <button id="deselectNodesButton" onclick="attemptDeselectNodes()">Deselecte current node(s)</button>
+                <p>Click on a non-leaf node to select it, and then click the buttons below to collapse, expand, or deselect the node</p>
+                <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a Node to Collapse</button>
+                <button id="deselectNodesButton" onclick="attemptDeselectNodes()" disabled>Deselect Selected Node</button>
             </div>
             <div class="vizOptionsContainer">
                 <p>The selected node's information is displayed below</p>
                 <div id="tooltip">
                     <div class="attributeContainer">
                         <div class="attributeLabel">Node ID:</div>
-                        <div class="attributeValue" id="idField">###</div>
+                        <div class="attributeValue" id="idField"> </div>
                     </div>
                     <div class="attributeContainer">
-                        <div class="attributeLabel">Timestamp:</div>
-                        <div class="attributeValue" id="timestampField">###</div>
+                        <div class="attributeLabel">Poste Creation Time:</div>
+                        <div class="attributeValue" id="timestampField"> </div>
                     </div>
                     <div class="attributeContainer">
                         <div class="attributeLabel">Number of Likes:</div>
-                        <div class="attributeValue" id="numLikesField">###</div>
+                        <div class="attributeValue" id="numLikesField"> </div>
                     </div>
                     <div class="attributeContainer">
-                        <div class="attributeLabel">Number of Comments:</div>
-                        <div class="attributeValue" id="numCommentsField">###</div>
+                        <div class="attributeLabel">Number of Retweets:</div>
+                        <div class="attributeValue" id="numCommentsField"> </div>
+                    </div>
+                    <div class="attributeContainer">
+                        <div class="attributeLabel">Total Number of Followers:</div>
+                        <div class="attributeValue" id="numFollowersField"> </div>
                     </div>
                     <div class="attributeContainer">
                         <div class="attributeLabel">Degree of Contribution:</div>
-                        <div class="attributeValue" id="degContributionField">###</div>
+                        <div class="attributeValue" id="degContributionField"> </div>
                     </div>
                 </div>
             </div>  
         </div>
         <div id='bar_chart_div'>
+            <p>Single click on a bar below to highlight all nodes representing posts created during the time window. Double click on a bar to update bar graph to show only posts made during the selected time window. Click on empty space in the graph to de-highlight the highlighted nodes.</p>
             <div id="bar_chart_viz"></div>
             <div id="bar_chart_controls">
-                <button onClick="goBack(this)" id="goBackButton" disabled>Go Back</button>
+                <button onClick="goBack(this)" id="goBackButton" disabled>Return to Previous Time Interval</button>
             </div>
         </div>
     </div>
@@ -147,12 +168,24 @@
                 </svg>
             </div>
             <div id="legend">
-                <div style="text-align: center;">Legend</div>
+                <div style="text-align: center; font-weight: bold;">Legend</div>
                 <div class="legendItem">
                     <div class="graphicWrapper">
-                        <div class="legendGraphic" id="nodeLegend"></div>
+                        <div class="legendGraphic nodeLegend"></div>
                     </div>
-                    <div class="legendText">A user who has posted the viral hashtag</div>
+                    <div class="legendText">A user who has posted the viral hashtag (unselected)</div>
+                </div>
+                <div class="legendItem">
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic nodeLegend nodeLegendOther" style="border: 3px limegreen solid;"></div>
+                    </div>
+                    <div class="legendText">A user who has been selected</div>
+                </div>
+                <div class="legendItem">
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic nodeLegend nodeLegendOther" style="border: 3px orange solid;"></div>
+                    </div>
+                    <div class="legendText">A user who has been highlighted</div>
                 </div>
                 <div class="legendItem">
                     <div class="graphicWrapper">
@@ -167,16 +200,35 @@
                     <div class="legendText">End of edge connected to the user being followed</div>
                 </div>
                 <div class="legendItem">
-                    <div id="levelBarIndicatorText">Bottom level bar</div>
-                    <div id="levelLegend">
-                        <div class="legendText">Highest ranked by number of nodes</div>
-                        <div class="graphicWrapper">
-                            <div class="legendGraphic" id="levelBarColors"></div>
-                        </div>
-                        <div class="legendText">Lowest ranked by number of nodes</div>
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic" id="nonColoredLegend"></div>
                     </div>
+                    <div class="legendText">Edge not using divergent coloring</div>
+                </div>
+                <br>
+                <div style="text-align: center; font-weight: bold;">Instructions for Network Graph</div>
+                <div class="legendItem instructionItem">
+                    Scroll to zoom in or out of the network graph
+                </div>
+                <div class="legendItem instructionItem">
+                    Click and drag to pan in any direction
+                </div>
+                <div class="legendItem instructionItem">
+                    Click on a node to select it
+                </div>
+                <div class="legendItem instructionItem">
+                    Use the sidebar on the left for various control options
+                </div>
+                <div id="levelBarIndicatorText">Bottom level bar</div>
+                <div id="levelLegend">
+                    <div class="legendText">Highest ranked by number of nodes</div>
+                    <div class="graphicWrapper">
+                        <div class="legendGraphic" id="levelBarColors"></div>
+                    </div>
+                    <div class="legendText">Lowest ranked by number of nodes</div>
                 </div>
             </div>
+            <div id="legendButton" onclick="showOrHideLegend()">ℹ️</div>
         </div>
     </div>
 </div>
@@ -189,14 +241,15 @@
     var nodeWidth;  // this will be set in the tree drawing function
     var windowHeight = window.innerHeight;
     var levelGraphHeight = 30;
-    var networkGraphHeight = document.getElementById('complete_viz').clientHeight - 20 - levelGraphHeight;//windowHeight * 0.95;
+    var networkGraphHeight = document.getElementById('complete_viz').clientHeight - levelGraphHeight;//windowHeight * 0.95;
     var levelGraphYPos;  // this will be set in the tree drawing function
-    var barGraphHeight = document.getElementById('bar_chart_div').clientHeight//windowHeight * 0.3;
+    var barGraphHeight = document.getElementById('bar_chart_div').clientHeight - 40;//windowHeight * 0.3;
     var useGradientOnTreeEdges = true;
     var useGradientOnExtraEdgesWithin = true;
     var useGradientOnExtraEdgesAcross = true;
     var selectedNodeId = null;
     var attributeForNodeSize = null;
+    var showLegend = false;
 
     let selectedNodesIds = []
 
@@ -237,6 +290,7 @@
         console.log(data);
         nodeData = data;
         loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
+        console.log(loneNodes);
         //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
