@@ -114,16 +114,25 @@ function drawPathBetweenNodes(d) {
     }
     return pathString;
 }
+function setSameLevelArcScale(links) {
+    let sameLevelLinks = links.filter(d => d.source.data.level == d.target.data.level);
+    let dataRange = d3.extent(sameLevelLinks.map(d => Math.abs(d.source.x - d.target.x)));
+    arcHeightScale = d3.scaleLinear().domain(dataRange).range([6, nodeWidth - 10]);
+}
 function drawArcBetweenSameLevel(d) {
     let start = d.source.x;    // X position of start node on the X axis
     let end = d.target.x;      // X position of end node
     let height = d.source.y; // this would be the same for the two points since they are in the same level
     return ['M', height, start,    // the arc starts at the coordinate x=start, y=height-30 (where the starting node is)
         'A',                            // This means we're gonna build an elliptical arc
-        (start - end)/4, ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
+        getArcHeight(start, end), ',',    // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
         (start - end)/2, 0, 0, ',',
         start < end ? 1 : 0, height, ',', end] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
         .join(' ');
+}
+function getArcHeight(start, end) {
+    let adjustedHeight = arcHeightScale(Math.abs(start - end));
+    return adjustedHeight;
 }
 function updateEdgeColors(type) {
     if (type == "tree") {

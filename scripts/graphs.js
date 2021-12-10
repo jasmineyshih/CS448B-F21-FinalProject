@@ -148,6 +148,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .on("click", updateSelectedNode);
 
     let extraLinksBetweenNodes = getLinksBetweenNodes(root.descendants(), true, true);
+    setSameLevelArcScale(extraLinksBetweenNodes);
     svg.append("g")
         .attr("id", "nonTreeEdgeGroup")
         .attr("fill", "none")
@@ -233,7 +234,11 @@ function updateTree() {
                 .attr("d", computePathCommandsForTreeEdges);
             },
             update => {
-                return update.classed("fakeRootElements", d => d.source.data.id == "0")
+                return update.attr("class", d => `from${d.target.data.id} to${d.source.data.id}`)
+                    .classed("fakeRootElements", d => d.source.data.id == "0")
+                    .classed("treeEdges", true)
+                    .attr("stroke", getGradientForTreeLink)
+                    .attr("id", d => "link" + d.target.data.id + "to" + d.source.data.id)
                     .attr("d", computePathCommandsForTreeEdges);
             },
             exit => {
@@ -258,7 +263,13 @@ function updateTree() {
                     .on("click", updateSelectedNode);
             },
             update => {
-                return update.attr("transform", d => `translate(${d.y},${d.x})`);
+                return update.classed("fakeRootElements", d => d.data.id == "0")
+                    .attr("id", d => "node" + d.data.id)
+                    .attr("transform", d => `translate(${d.y},${d.x})`)
+                    .select("circle")
+                    .attr("id", d => "circle" + d.data.id)
+                    .attr("r", computeNodeRadius)
+                    .on("click", updateSelectedNode);
             },
             exit => {
                 return exit.remove();
@@ -266,6 +277,7 @@ function updateTree() {
         );
 
     let extraLinksBetweenNodes = getLinksBetweenNodes(tree.descendants(), true, true);
+    setSameLevelArcScale(extraLinksBetweenNodes);
     svg.select("#nonTreeEdgeGroup")
         .selectAll("path")
         .data(extraLinksBetweenNodes)
@@ -280,7 +292,12 @@ function updateTree() {
                 .attr("d", drawPathBetweenNodes);
             },
             update => {
-                return update.attr("d", drawPathBetweenNodes);
+                return update.attr("class", d => `from${d.source.data.id} to${d.target.data.id}`)
+                    .attr("d", drawPathBetweenNodes)
+                    .classed("extraEdgesAcrossLevels", d => !d.sameLevel)
+                    .classed("extraEdgesWithinLevels", d => d.sameLevel)
+                    .attr("stroke", getGradientForLink)
+                    .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id);
             },
             exit => {
                 return exit.remove();
@@ -312,8 +329,6 @@ function updateTree() {
             )
         }
     });
-    console.log(updatableData);
-    console.log(curr_time_measures.measure)
     if (curr_time_measures.measure === "day"){
         getTimeStampByDate(timestamps, updatableData)
     } else if (curr_time_measures.measure === "hour"){
@@ -321,8 +336,6 @@ function updateTree() {
     } else if (curr_time_measures.measure === "min"){
         getTimeStampByMinute(timestamps, updatableData, curr_time_measures.hour, curr_time_measures.date,curr_time_measures.month, curr_time_measures.year)
     }
-    console.log(updatableData);
-    selectedNodesByTimestamps(window.event,updatableData)
     bar_svg.selectAll('g').remove()
     d3.select('.tooltipBars').transition()		
         .duration(500)		
@@ -360,7 +373,6 @@ function drawTimestampBarChart(nodeList){
     //nodeData is already sorted with respect to timestamp. So, timestamp is sorted too
     curr_time_measures = {measure: "day"};
     getTimeStampByDate(timestamps, updatableData)
-    console.log(updatableData);
     bar_svg = drawBarSvg()
     drawBars(timestamps, updatableData, bar_svg)
     // setInterval(()=>{
