@@ -1,5 +1,5 @@
 body {
-    margin: 2px;
+    margin: 5px;
 }
 .sidebar {
     font-family: 'Montserrat', sans-serif;
@@ -7,12 +7,12 @@ body {
     display: inline-block;
     background: #dddddd;
     border: 2px solid black;
-    border-radius: 5px 5px 0 0;
+    border-radius: 5px;
     height: fit-content;
 }
 .vizOptionsContainer {
-    margin: 0px 10px;
-    padding: 5px 0px;
+    margin: 10px;
+    padding: 5px;
     font-size: 12px;
 }
 .vizOptionsContainer button {
@@ -26,24 +26,13 @@ body {
     font-size: 10px;
     font-style: italic;
 }
-.networkVizOptions {
-    margin-top: 1px;
-}
 .singleOption {
     display: flex;
+    margin: 2px 0px;
 }
 .singleOption label {
     margin-left: 3px;
-}
-.singleOptionGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-.checkboxContainer input {
-    transform: translateY(3px);
-}
-input {
-    margin: 1px;
+    margin-top: 1px;
 }
 #tooltip {		
     text-align: left;			
@@ -67,17 +56,6 @@ input {
     width: 100%;
     display: grid;
 }
-.nodes {
-    cursor: pointer;
-}
-#legendButton {
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 24px;
-    margin-right: 5px;
-    cursor: pointer;
-}
 #legend {
     opacity: 0.8;
     position: absolute;
@@ -87,35 +65,23 @@ input {
     border: 2px solid black;
     border-radius: 4px;
     padding: 0.5em;
-    margin: 0px 2px 0 0;
+    margin: 0.5em;
     font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+    font-size: 11px;
     text-align: left;
     width: 360px;
-    display: none;
-}
-.legendItem {
-    font-size: 11px;
-}
-.instructionItem {
-    padding: 0px 10px;
 }
 .graphicWrapper {
     width: 3em;
     height: 100%;
     float: left;
 }
-.nodeLegend {
-    transform: translateY(2px);
+#nodeLegend {
     margin: auto;
-    height: 11px;
-    width: 11px;
+    height: 1em;
+    width: 1em;
+    background-color: #999;
     border-radius: 50%;
-    background-color: black;
-}
-.nodeLegendOther {
-    height: 5px;
-    width: 5px;
 }
 #followerLegend {
     width: 1.5em;
@@ -129,11 +95,6 @@ input {
     margin: 0.5em 0.5em 0.3em auto;
     background-color: red;
 }
-#nonColoredLegend {
-    width: 1.5em;
-    height: 0.2em;
-    margin: 0.5em 0.5em 0.3em auto;
-    background-color: #555;
 #levelBarColors{
     width: 580%;
     height: 1em;
@@ -154,23 +115,18 @@ input {
     visibility: hidden;
 }
 .selectedNode {
-    stroke: limegreen !important;
-    stroke-width: 1px;
-    fill-opacity: 1;
-}
-.highlightedNodes {
-    stroke: orange !important;
-    stroke-width: 1px;
+    stroke: black !important;
+    stroke-width: 2px;
     fill-opacity: 1;
 }
 .collapsedNode {
-    stroke: #000;
+    stroke: #999;
     fill: url(#patternCheckers);
-    stroke-width: 1px;
+    stroke-width: 2px;
     fill-opacity: 1;
 }
 .checker {
-    fill: #000;
+    fill: #777;
 }
 .dimmedEdges {
     stroke-opacity: 0.1;
@@ -191,16 +147,15 @@ div.tooltipBars {
     position: absolute;			
     text-align: center;				
     padding: 2px;				
-    font: 12px sans-serif;	
-    background: #663781;
+    font: 12px sans-serif;		
+    background: #663781;	
     border: 0px;		
     border-radius: 8px;			
     pointer-events: none;
     overflow: hidden;
     color: white;
     font-weight:600;
-    font-family: 'Montserrat', sans-serif;
-    z-index: 100;
+    font-family: Open Sans;		
 }
 .attributeContainer {
     width: 100%;
@@ -214,38 +169,29 @@ div.tooltipBars {
 }
 
 #bar_chart_viz {
-    font-size: 12px;;
     user-select: none;
 }
-#bar_chart_controls {
-    padding: 0 10px 2px 10px;
-    text-align: center;
-}
+
 #bar_chart_div{
-    margin: 0px;
-    padding-top: 5px;
-    border: black solid 2px;
-    border-top: none;
-    border-radius: 0 0 5px 5px;
-    font-family: 'Montserrat', sans-serif;
+    margin-top: 20px;
+    margin-bottom: 0;
 }
-#bar_chart_div p {
-    margin: 0px;
-    padding: 0 10px;
-    font-size: 10px;
-    font-style: italic;
-}
+
 #goBackButton{
     margin: 0;
+    position: relative;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
     background-color: darkblue;
     border: none;
     color: white;
-    padding: 2px 5px;
+    padding: 8px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 12px;
-    border-radius: 4px;
+    font-size: 16px;
+    border-radius: 6px;
 }
 
 button:disabled {
@@ -271,5 +217,4 @@ button:disabled {
     margin-top: 10px;
     width: 100%;
     overflow: hidden;
-    font-family: 'Montserrat', sans-serif;
 }
