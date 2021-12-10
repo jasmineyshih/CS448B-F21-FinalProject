@@ -112,6 +112,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     /* done drawing level bars */
 
     svg.append("g")
+        .attr("id", "treeEdgeGroup")
         .attr("fill", "none")
         .attr("stroke-opacity", strokeOpacity)
         .attr("stroke-linecap", strokeLinecap)
@@ -128,9 +129,11 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("d", computePathCommandsForTreeEdges);
 
     const node = svg.append("g")
+        .attr("id", "nodeGroup")
         .selectAll("a")
         .data(root.descendants())
         .join("a")
+        .classed("nodes", true)
         .classed("fakeRootElements", d => d.data.id == "0")
         .attr("id", d => "node" + d.data.id)
         .attr("xlink:href", link == null ? null : d => link(d.data, d))
@@ -186,10 +189,9 @@ function updateTree() {
     } else {
         nodeData = nonLoneNodes;
     }
-    
     fakeRoot = transformToNested(nodeData);
     tree = d3.hierarchy(fakeRoot);
-    let nodeHeight = 8 * 2;
+    let nodeHeight = maxRadius * 2;
     let padding = 0.5;
     const totalWidth = nodeWidth * (tree.height + padding);
     d3.tree().nodeSize([nodeHeight, nodeWidth])(tree);    // compute and set the x and y coordiantes of each node
@@ -250,7 +252,7 @@ function updateTree() {
                     .attr("transform", d => `translate(${d.y},${d.x})`)
                     .append("circle")
                     .attr("id", d => "circle" + d.data.id)
-                    .attr("fill", "#999")
+                    .attr("fill", "#000")
                     .attr("fill-opacity", "0.8")
                     .attr("r", computeNodeRadius)
                     .on("click", updateSelectedNode);
