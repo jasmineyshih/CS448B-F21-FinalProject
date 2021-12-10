@@ -67,11 +67,9 @@ function Tree(data, { // data is in hierarchy (nested objects) form
             .scaleExtent([1, 24])
             .on("zoom", zoom));
     
+
     /* draw level bars here since the level bars svg needs to match the size of the network graph svg */
     setNodesPerLevel(root)
-    //let width = networkGraphWidth; 
-    //let height = 30;//document.getElementById('bar_chart_div').clientHeight
-
     d3.select("#levelBarContainer")
         .style("height", levelGraphHeight + "px");
     let levelBarSvg = d3.select("#levelBar")
@@ -79,15 +77,13 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("width", totalWidth)
         .attr("height", height)
         .attr("transform", `translate(-${dy}, 0)`);
-
-    //let levelBar = d3.select("#levelBar").selectAll('rect').data(nodesPerLevel);
     let totalLevels = nodesPerLevel.length;
-
+    console.log(nodesPerLevel);
     levelBarSvg.selectAll('rect')
         .data(nodesPerLevel)
         .enter()
         .append('rect')
-        .attr('x', d => d.xPos - nodeHeight/*80+(d.level-1)*widthPerRect*/)
+        .attr('x', d => d.xPos - nodeHeight)
         .attr('y', 0)
         .attr('width', nodeWidth)
         .attr('height', levelGraphHeight)
@@ -190,7 +186,6 @@ function drawTimestampBarChart(treeHierarchy){
     })
 
     //nodeData is already sorted with respect to timestamp. So, timestamp is sorted too
-    console.log(timestamps)
     getTimeStampByDate(timestamps, updatableData)
     bar_svg = drawBarSvg()
     drawBars(timestamps, updatableData, bar_svg)
@@ -206,8 +201,6 @@ function drawBarSvg(){
     // let height = document.getElementById('bar_chart_div').clientHeight
     let width = sidebarWidth;//document.getElementById('bar_chart_div').clientWidth
     let height = barGraphHeight;//document.getElementById('bar_chart_div').clientHeight
-
-    console.log(width+" "+height)
 
     let svg = d3.select("#bar_chart_viz")
         .append("svg")
@@ -263,12 +256,6 @@ function drawBars(originalData, data, svg){
         .ticks(maxCount>10?10:maxCount))
         .selectAll(".tick, .domain")
         .attr("stroke-opacity", 0.2)
-
-    
-    
-    console.log(yScale(59))
-
-    console.log(data)
 
     // let timeBars = document.getElementById('time_bars')
     // let svgBox = timeBars.viewBox.baseVal;
@@ -331,8 +318,6 @@ function drawBars(originalData, data, svg){
                 console.log("measure minute")
                 selectTimeStampByMinute(timestamps, data, timestamp.min, timestamp.hour, timestamp.date,timestamp.month,timestamp.year)
             }
-            console.log("after update")
-            console.log(data)
             selectedNodesByTimestamps(e,data)
             d3.select(`#data${d.id}`)
                 .style("opacity", '0.8')
@@ -371,8 +356,10 @@ function drawBars(originalData, data, svg){
 
 }
 
+/*  this function is no longer called. The task is instead done in the Tree function
 function drawLevelBars(treeHierarchy){
     setNodesPerLevel(treeHierarchy)
+    console.log("nodesPerLevel", nodesPerLevel);
     let width = networkGraphWidth;  // include the space used for the ghost node in the width
     let height = 30;//document.getElementById('bar_chart_div').clientHeight
 
@@ -383,13 +370,12 @@ function drawLevelBars(treeHierarchy){
     let levelBar = d3.select("#levelBar").selectAll('rect').data(nodesPerLevel);
     let totalLevels = nodesPerLevel.length;
 
-    console.log(nodesPerLevel);
     levelBar.enter().append('rect')
-        .attr('x', d => d.xPos - nodeWidth/*80+(d.level-1)*widthPerRect*/)
+        .attr('x', d => d.xPos - nodeWidth)
         .attr('y', 0)
         .attr('width', nodeWidth)
         .attr('height', height)
         .style('fill', 'darkblue')
         .style('opacity', d=>d.rank/totalLevels)
         .attr('stroke', 'black')
-}
+}*/

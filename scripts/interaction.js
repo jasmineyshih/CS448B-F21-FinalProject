@@ -322,7 +322,6 @@ function getTimeStampByDate(originalData, updatableData){
         })
     })
     xAxisLabel = "Days"
-    console.log(updatableData)
 }
 
 function getTimeStampByHour(originalData, updatableData, date, month, year){
@@ -334,7 +333,6 @@ function getTimeStampByHour(originalData, updatableData, date, month, year){
     for (let i = 0; i<24; i++){
         timeMap.set(i, {count: 0, timestamps:[]})
     }
-    console.log(timeMap)
     xAxisLabel = "Hours ("+new Date(filteredData[0].timestamp).toDateString()+")"
     filteredData.forEach(timeData =>{
         let key = timeData.hour
@@ -363,7 +361,6 @@ function getTimeStampByHour(originalData, updatableData, date, month, year){
             count: value.count
         })
     })
-    console.log(updatableData)
 }
 
 
@@ -377,8 +374,6 @@ function getTimeStampByMinute(originalData, updatableData, hour,date, month, yea
     for (let i = 5; i<=60; i+=5){
         timeMap.set(i, {count: 0, timestamps:[]})
     }
-    
-    console.log(filteredData)
     xAxisLabel = "Minutes ("+new Date(filteredData[0].timestamp).toDateString()+" from "
                     + `${getStandardHour(hour)}${getAmPm(hour)} to ${getStandardHour(hour+1)}${getAmPm(hour+1)})`
     filteredData.forEach(timeData =>{

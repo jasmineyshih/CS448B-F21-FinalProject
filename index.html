@@ -201,7 +201,7 @@
     var fakeRoot;   // used to store all level 0 nodes as children for easier drawing
     var tree;   // used to store all level 0 nodes as children for easier drawing
     
-    d3.json("data/users_with_tweet_and_followers.json").then(function(data) {
+    d3.json("data/urban_dictionary_tweets_and_followers.json").then(function(data) {
         // TODO: delete nodeData = data.nodes;
         // TODO: delete linkData = data.links;
         console.log(data);
@@ -218,7 +218,6 @@
             height: networkGraphHeight,
             r: maxRadius
         });
-        console.log('the tree', tree)
         drawTimestampBarChart(tree)
         //drawLevelBars(tree)   /* this is now drawn in the tree function */
         console.log(fakeRoot);
