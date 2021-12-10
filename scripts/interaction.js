@@ -291,7 +291,7 @@ function setNodesPerLevel(treeHierarchy){
     let prevCount = 0
     levelMap.forEach((value, key)=>{
         if(key !== 0){
-            let growth =  prevCount == 0? "N/A": Math.floor((value.count - prevCount)*100/prevCount)
+            let growth =  prevCount == 0? "Inf": Math.floor((value.count - prevCount)*100/prevCount)
             nodesPerLevel.push(
                 {
                     "level": key,
@@ -299,8 +299,8 @@ function setNodesPerLevel(treeHierarchy){
                     "xPos": value.xPos,
                     "growth": growth
                 }
-            );
-            prevCount = value.count;      
+            )
+            prevCount = value.count                                       
         }
     })
 
