@@ -97,14 +97,12 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .on("mousemove", function(e,d) {
             tooltipLevelBars.transition()		
                 .duration(200)		
-                .style("opacity", .9);		
-            tooltipLevelBars.html(`Level:${d.level}<br>Total nodes: ${d.count}`)	
+                .style("opacity", 1);		
+            tooltipLevelBars.html(`Level:${d.level}<br>Total nodes: ${d.count}<br>Growth compared to previous level: ${d.growth}%`)	
                 .style("left", (e.x + 10) + "px")		
-                .style("top", (e.y + 10) + "px");	
+                .style("top", (e.y - 60) + "px");	
         })
         .on("mouseout", function(e,d) {	
-            d3.select(`#data${d.id}`)
-                .style("opacity", '0.8')
             tooltipLevelBars.transition()		
                 .duration(500)		
                 .style("opacity", 0);	

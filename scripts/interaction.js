@@ -288,15 +288,19 @@ function setNodesPerLevel(treeHierarchy){
     })
 
     nodesPerLevel.length = 0
+    let prevCount = 0
     levelMap.forEach((value, key)=>{
         if(key !== 0){
+            let growth =  prevCount == 0? "Inf": Math.floor((value.count - prevCount)*100/prevCount)
             nodesPerLevel.push(
                 {
                     "level": key,
                     "count": value.count,
-                    "xPos": value.xPos
+                    "xPos": value.xPos,
+                    "growth": growth
                 }
-            )                                       
+            )
+            prevCount = value.count                                       
         }
     })
 
@@ -313,6 +317,24 @@ function setNodesPerLevel(treeHierarchy){
 function getTimeStampByDate(originalData, updatableData){
     updatableData.length = 0
     let timeMap = new Map()
+    let startTimeSTamp = originalData[0].timestamp
+    let endTimeSTamp = originalData[originalData.length-1].timestamp
+    let currTimeStamp = startTimeSTamp
+    while(currTimeStamp<endTimeSTamp){
+        let date = new Date(currTimeStamp);
+        let currDate = date.getDate()
+        let currMonth = date.getMonth()
+        let currYear = date.getFullYear()
+        let key = currYear+""+currMonth+""+currDate
+        let currTimeData = {
+            date: currDate,
+            month: currMonth,
+            year: currYear,
+            timestamp: currTimeStamp
+        }
+        timeMap.set(key, {count: 0, timestamps: [currTimeData]})
+        currTimeStamp += 86400000
+    }
     originalData.forEach(timeData =>{
         let key = timeData.year+""+timeData.month+""+timeData.date
         if (timeMap.has(key)){

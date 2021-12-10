@@ -95,6 +95,22 @@ body {
     margin: 0.5em 0.5em 0.3em auto;
     background-color: red;
 }
+#levelBarColors{
+    width: 580%;
+    height: 1em;
+    margin: 0.5em 0.5em 0.3em auto;
+    padding-top: 2em;
+    background-image: linear-gradient(to right, darkblue , lightsteelblue);
+}
+#levelLegend{
+    display: grid;
+    grid-template-columns: .2fr .6fr .2fr;
+    padding-left: 1em;
+}
+#levelBarIndicatorText{
+    margin-top: 1em;
+    text-align: center;
+}
 .fakeRootElements {
     visibility: hidden;
 }
@@ -132,14 +148,14 @@ div.tooltipBars {
     text-align: center;				
     padding: 2px;				
     font: 12px sans-serif;		
-    background: #3F51B5;	
+    background: #663781;	
     border: 0px;		
     border-radius: 8px;			
     pointer-events: none;
     overflow: hidden;
     color: white;
     font-weight:600;
-    font-family: Open Sans;			
+    font-family: Open Sans;		
 }
 .attributeContainer {
     width: 100%;
