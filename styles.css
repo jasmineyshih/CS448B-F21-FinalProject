@@ -111,6 +111,22 @@ body {
     margin-top: 1em;
     text-align: center;
 }
+#levelBarColors{
+    width: 580%;
+    height: 1em;
+    margin: 0.5em 0.5em 0.3em auto;
+    padding-top: 2em;
+    background-image: linear-gradient(to right, darkblue , lightsteelblue);
+}
+#levelLegend{
+    display: grid;
+    grid-template-columns: .2fr .6fr .2fr;
+    padding-left: 1em;
+}
+#levelBarIndicatorText{
+    margin-top: 1em;
+    text-align: center;
+}
 .fakeRootElements {
     visibility: hidden;
 }
