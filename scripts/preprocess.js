@@ -42,6 +42,7 @@ function preprocessData(nodeData, nodeLookup) {
         if (currNode.parents.length == 0 && currNode.allChildren.length == 0) {
             let removedList = nodeData.splice(currIndex, 1);  // remove node from list, decrease total length, and add removed node to lone node list
             nodeListLength--;
+            removedList[0].degOfContribution = 0;
             loneNodeList.push(removedList[0]);
         } else {
             currIndex++;
