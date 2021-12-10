@@ -69,6 +69,10 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     
 
     /* draw level bars here since the level bars svg needs to match the size of the network graph svg */
+    let tooltipLevelBars = d3.select("#bar_chart_div").append("div")	
+        .attr("class", "tooltipBars")				
+        .style("opacity", 0);
+
     setNodesPerLevel(root)
     d3.select("#levelBarContainer")
         .style("height", levelGraphHeight + "px");
@@ -78,7 +82,6 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("height", height)
         .attr("transform", `translate(-${dy}, 0)`);
     let totalLevels = nodesPerLevel.length;
-    console.log(nodesPerLevel);
     levelBarSvg.selectAll('rect')
         .data(nodesPerLevel)
         .enter()
@@ -90,6 +93,21 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .style('fill', 'darkblue')
         .style('opacity', d=>d.rank/totalLevels)
         .attr('stroke', 'black')
+        .on("mousemove", function(e,d) {
+            tooltipLevelBars.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            tooltipLevelBars.html(`Level:${d.level}<br>Total nodes: ${d.count}`)	
+                .style("left", (e.x + 10) + "px")		
+                .style("top", (e.y + 10) + "px");	
+        })
+        .on("mouseout", function(e,d) {	
+            d3.select(`#data${d.id}`)
+                .style("opacity", '0.8')
+            tooltipLevelBars.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+            })
     /* done drawing level bars */
 
     svg.append("g")
