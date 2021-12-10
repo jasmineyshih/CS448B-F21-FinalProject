@@ -16,7 +16,7 @@ function Tree(data, svg, levelBarContainer, levelBarSvg, id_tag, { // data is in
     height, // outer height, in pixels
     r, // radius of nodes
     padding = 0.5, // horizontal padding for first and last column
-    fill = "#000", // fill for nodes
+    fill = "#263238", // fill for nodes
     fillOpacity = "0.8", // fill opacity for nodes
     stroke = "#555", // stroke for links
     strokeWidth = 1, // stroke width for links
@@ -27,6 +27,11 @@ function Tree(data, svg, levelBarContainer, levelBarSvg, id_tag, { // data is in
     haloWidth = 3, // padding around the labels
     } = {})
 {
+    if(id_tag == 2){
+        r = 5
+        // svg
+    }
+
     // we assume that the data is specified as an object {children} with nested objects (a.k.a. the “flare.json” format), and use d3.hierarchy.
     const root = d3.hierarchy(data, children);
 
@@ -54,6 +59,7 @@ function Tree(data, svg, levelBarContainer, levelBarSvg, id_tag, { // data is in
     let height_mult = (x1 - x0 + dx * 2) / (height);
     // Compute the default height.
     if (height === undefined) height = x1 - x0 + dx * 2;
+    
 
     svg.attr("viewBox", [-dy * padding / 2, x0 - dx, totalWidth, height*height_mult])
         .attr("width", totalWidth)
@@ -62,6 +68,7 @@ function Tree(data, svg, levelBarContainer, levelBarSvg, id_tag, { // data is in
         .attr("style", "height: 100%;")
         .attr("font-family", "sans-serif")
         .attr("font-size", 10)
+        .style("background-color", ()=>id_tag==2?"#eceff1":"white")
         .call(d3.zoom()
             .translateExtent([[-dy * padding / 2, x0 - dx], [totalWidth, height * height_mult]])
             .scaleExtent([1, 24])

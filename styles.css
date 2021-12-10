@@ -61,6 +61,7 @@ body {
     position: relative;
     width: 100%;
     display: grid;
+    background-color: #eceff1;
 }
 
 #legend {
