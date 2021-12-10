@@ -292,8 +292,13 @@ function setNodesPerLevel(treeHierarchy){
     })
 
     nodesPerLevel.sort((a,b)=>a.count - b.count)
-    nodesPerLevel.map(node => node.rank = nodesPerLevel.indexOf(node)+1)
-    
+    for (let i = 0; i<nodesPerLevel.length; i++){
+        let rank = i+1;
+        if(i>0 && nodesPerLevel[i-1].count == nodesPerLevel[i].count){
+            rank = i;
+        }
+        nodesPerLevel[i].rank = rank
+    }
 }
 
 function getTimeStampByDate(originalData, updatableData){

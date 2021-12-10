@@ -16,10 +16,10 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     height, // outer height, in pixels
     r, // radius of nodes
     padding = 0.5, // horizontal padding for first and last column
-    fill = "#999", // fill for nodes
+    fill = "#000", // fill for nodes
     fillOpacity = "0.8", // fill opacity for nodes
     stroke = "#555", // stroke for links
-    strokeWidth = 2, // stroke width for links
+    strokeWidth = 1, // stroke width for links
     strokeOpacity = 0.35, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
     strokeLinecap, // stroke line cap for links
@@ -29,7 +29,6 @@ function Tree(data, { // data is in hierarchy (nested objects) form
 {
     // we assume that the data is specified as an object {children} with nested objects (a.k.a. the “flare.json” format), and use d3.hierarchy.
     const root = d3.hierarchy(data, children);
-    console.log(root);
 
     // Compute labels and titles.
     const descendants = root.descendants();
@@ -70,6 +69,10 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     
 
     /* draw level bars here since the level bars svg needs to match the size of the network graph svg */
+    let tooltipLevelBars = d3.select("#bar_chart_div").append("div")	
+        .attr("class", "tooltipBars")				
+        .style("opacity", 0);
+  
     setNodesPerLevel(root)
     d3.select("#levelBarContainer")
         .style("height", levelGraphHeight + "px");
@@ -79,7 +82,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("height", height)
         .attr("transform", `translate(-${dy}, 0)`);
     let totalLevels = nodesPerLevel.length;
-    console.log(nodesPerLevel);
+
     levelBarSvg.selectAll('rect')
         .data(nodesPerLevel)
         .enter()
@@ -91,10 +94,24 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .style('fill', 'darkblue')
         .style('opacity', d=>d.rank/totalLevels)
         .attr('stroke', 'black')
+        .on("mousemove", function(e,d) {
+            tooltipLevelBars.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            tooltipLevelBars.html(`Level:${d.level}<br>Total nodes: ${d.count}`)	
+                .style("left", (e.x + 10) + "px")		
+                .style("top", (e.y + 10) + "px");	
+        })
+        .on("mouseout", function(e,d) {	
+            d3.select(`#data${d.id}`)
+                .style("opacity", '0.8')
+            tooltipLevelBars.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+            })
     /* done drawing level bars */
 
     svg.append("g")
-        .attr("id", "treeEdgeGroup")
         .attr("fill", "none")
         .attr("stroke-opacity", strokeOpacity)
         .attr("stroke-linecap", strokeLinecap)
@@ -111,11 +128,9 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("d", computePathCommandsForTreeEdges);
 
     const node = svg.append("g")
-        .attr("id", "nodeGroup")
         .selectAll("a")
         .data(root.descendants())
         .join("a")
-        .classed("nodes", true)
         .classed("fakeRootElements", d => d.data.id == "0")
         .attr("id", d => "node" + d.data.id)
         .attr("xlink:href", link == null ? null : d => link(d.data, d))

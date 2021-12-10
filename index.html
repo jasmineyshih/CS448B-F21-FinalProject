@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
+<html>
+
+<head>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
 <script src="scripts/util.js"></script>
@@ -12,6 +15,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+</head>
+
+<body>
 
 <div id='complete_tool'>
     <div id="barchart_side_bar">
@@ -197,8 +203,8 @@
     /* svg variables */
     var svg = d3.select("#network");
     var solidEdgeColor = "#555";
-    var minRadius = 4;
-    var maxRadius = 8;
+    var minRadius = 1;
+    var maxRadius = 2;
     var midRadius = (minRadius + maxRadius) / 2
     var nodeSizeScale;
     var hiddenNodeSet = new Set();
@@ -236,3 +242,5 @@
         console.log(fakeRoot);
     });
 </script>
+</body>
+</html>
