@@ -29,6 +29,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
 {
     // we assume that the data is specified as an object {children} with nested objects (a.k.a. the “flare.json” format), and use d3.hierarchy.
     const root = d3.hierarchy(data, children);
+    console.log(root);
 
     // Compute labels and titles.
     const descendants = root.descendants();
@@ -93,6 +94,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
     /* done drawing level bars */
 
     svg.append("g")
+        .attr("id", "treeEdgeGroup")
         .attr("fill", "none")
         .attr("stroke-opacity", strokeOpacity)
         .attr("stroke-linecap", strokeLinecap)
@@ -109,9 +111,11 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("d", computePathCommandsForTreeEdges);
 
     const node = svg.append("g")
+        .attr("id", "nodeGroup")
         .selectAll("a")
         .data(root.descendants())
         .join("a")
+        .classed("nodes", true)
         .classed("fakeRootElements", d => d.data.id == "0")
         .attr("id", d => "node" + d.data.id)
         .attr("xlink:href", link == null ? null : d => link(d.data, d))
@@ -127,6 +131,7 @@ function Tree(data, { // data is in hierarchy (nested objects) form
 
     let extraLinksBetweenNodes = getLinksBetweenNodes(root.descendants(), true, true);
     svg.append("g")
+        .attr("id", "nonTreeEdgeGroup")
         .attr("fill", "none")
         .attr("stroke-opacity", strokeOpacity)
         .attr("stroke-linecap", strokeLinecap)
@@ -157,6 +162,113 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("stroke-width", haloWidth);
         
     return root;
+}
+function updateTree() {
+    showLoneNodes = showLoneNodes ? false : true;
+    if (showLoneNodes) {
+        nodeData = nonLoneNodes.concat(loneNodes);
+        nodeData.sort((a, b) => a.timestamp - b.timestamp);
+    } else {
+        nodeData = nonLoneNodes;
+    }
+    
+    fakeRoot = transformToNested(nodeData);
+    tree = d3.hierarchy(fakeRoot);
+    let nodeHeight = 8 * 2;
+    let padding = 0.5;
+    const totalWidth = nodeWidth * (tree.height + padding);
+    d3.tree().nodeSize([nodeHeight, nodeWidth])(tree);    // compute and set the x and y coordiantes of each node
+
+    // Center the tree.
+    let x0 = Infinity;
+    let x1 = -x0;
+    tree.each(d => {
+        if (d.x > x1) x1 = d.x;
+        if (d.x < x0) x0 = d.x;
+    });
+    let height_mult = (x1 - x0 + nodeHeight * 2) / (networkGraphHeight);
+
+    svg.attr("viewBox", [-nodeWidth * padding / 2, x0 - nodeHeight, totalWidth, networkGraphHeight*height_mult])
+        .attr("width", totalWidth)
+        .attr("height", networkGraphHeight)
+        .attr("transform", `translate(-${nodeWidth}, 0)`)
+        .call(d3.zoom()
+            .translateExtent([[-nodeWidth * padding / 2, x0 - nodeHeight], [totalWidth, networkGraphHeight*height_mult]])
+            .scaleExtent([1, 24])
+            .on("zoom", zoom));
+    d3.select("#levelBar")
+        .attr("viewBox", [-nodeWidth * padding / 2, 0, totalWidth, networkGraphHeight*height_mult])
+        .attr("width", totalWidth)
+        .attr("height", networkGraphHeight)
+        .attr("transform", `translate(-${nodeWidth}, 0)`);
+
+    svg.select("#treeEdgeGroup")
+        .selectAll("path")
+        .data(tree.links())
+        .join(
+            enter => {
+                return enter.append("path")
+                .attr("class", d => `from${d.target.data.id} to${d.source.data.id}`)
+                .classed("fakeRootElements", d => d.source.data.id == "0")
+                .classed("treeEdges", true)
+                .attr("stroke", getGradientForTreeLink)
+                .attr("id", d => "link" + d.target.data.id + "to" + d.source.data.id)
+                .attr("d", computePathCommandsForTreeEdges);
+            },
+            update => {
+                return update.classed("fakeRootElements", d => d.source.data.id == "0")
+                    .attr("d", computePathCommandsForTreeEdges);
+            },
+            exit => {
+                return exit.remove();
+            }
+        );
+    svg.select("#nodeGroup")
+        .selectAll(".nodes")
+        .data(tree.descendants())
+        .join(
+            enter => {
+                return enter.append("a")
+                    .classed("nodes", true)
+                    .classed("fakeRootElements", d => d.data.id == "0")
+                    .attr("id", d => "node" + d.data.id)
+                    .attr("transform", d => `translate(${d.y},${d.x})`)
+                    .append("circle")
+                    .attr("id", d => "circle" + d.data.id)
+                    .attr("fill", "#999")
+                    .attr("fill-opacity", "0.8")
+                    .attr("r", computeNodeRadius)
+                    .on("click", updateSelectedNode);
+            },
+            update => {
+                return update.attr("transform", d => `translate(${d.y},${d.x})`);
+            },
+            exit => {
+                return exit.remove();
+            }
+        );
+
+    let extraLinksBetweenNodes = getLinksBetweenNodes(tree.descendants(), true, true);
+    svg.select("#nonTreeEdgeGroup")
+        .selectAll("path")
+        .data(extraLinksBetweenNodes)
+        .join(
+            enter => {
+                return enter.attr("class", d => `from${d.source.data.id} to${d.target.data.id}`)
+                .classed("extraEdgesBetweenNodes", true)
+                .classed("extraEdgesAcrossLevels", d => !d.sameLevel)
+                .classed("extraEdgesWithinLevels", d => d.sameLevel)
+                .attr("stroke", getGradientForLink)
+                .attr("id", d => "link" + d.source.data.id + "to" + d.target.data.id)
+                .attr("d", drawPathBetweenNodes);
+            },
+            update => {
+                return update.attr("d", drawPathBetweenNodes);
+            },
+            exit => {
+                return exit.remove();
+            }
+        );
 }
 
 function drawTimestampBarChart(treeHierarchy){

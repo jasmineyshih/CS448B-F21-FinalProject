@@ -169,14 +169,14 @@ function updateSelectedNode(event, d) {
     d3.select("#degContributionField").html(d.data.degOfContribution);
     event.stopPropagation();
 }
-d3.select("#viz").select("svg").on('click', function () {   // mouse click on empty space in the svg
-    // deselect currently selected node
-    if (selectedNodeId) {
+function attemptDeselectNodes() {   // mouse click on empty space in the svg
+    // deselect currently selected node(s)
+    if (selectedNodeId || selectedNodesIds.length > 0) {
         deselectSelectedNodes()
     }
-});
+};
 
-function deselectSelectedNodes(){
+function deselectSelectedNodes() {
     d3.select("#collapseExpandButton").classed("showButton", false);
     d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
     selectedNodeId = null;

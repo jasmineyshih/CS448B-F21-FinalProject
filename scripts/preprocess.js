@@ -47,6 +47,7 @@ function preprocessData(nodeData, nodeLookup) {
             currIndex++;
         }
     }
+    nonLoneNodes = nodeData;
     nodeData.forEach(node => nodeDataMap.set(node.id, node));   // load node data array into map
     levelize(nodeDataMap);
     setDirectParentChildren(nodeDataMap);
