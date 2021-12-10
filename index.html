@@ -69,8 +69,18 @@
                 </div>
             </div>
             <div class="vizOptionsContainer">
+                <p>Nodes with no edges going into or out of them are not shown by default.</p>
+                <div class="networkVizOptions">
+                    <div class="singleOption">
+                        <input type="checkbox" name="showLoneNodes" onclick="updateTree()">
+                        <label for="showLoneNodes">Show lone nodes</label>
+                    </div>
+                </div>
+            </div>
+            <div class="vizOptionsContainer">
                 <p>Click on a non-leaf node to select it, and then click the button below to collapse or expand the node</p>
                 <button id="collapseExpandButton" onclick="collapseOrExpandSelectedNode()" disabled>Select a node to collapse</button>
+                <button id="deselectNodesButton" onclick="attemptDeselectNodes()">Deselecte current node(s)</button>
             </div>
             <div class="vizOptionsContainer">
                 <p>The selected node's information is displayed below</p>
@@ -202,6 +212,9 @@
 
     /* data loading and preprocessing */
     var nodeData;   // list of nodes
+    var nonLoneNodes;
+    var showLoneNodes = false;
+    var loneNodes;
     // TODO: delete var linkData;   // list of links
     var nodeLookup = {};    // maps node id to node object for easy lookup
     var fakeRoot;   // used to store all level 0 nodes as children for easier drawing
@@ -212,7 +225,7 @@
         // TODO: delete linkData = data.links;
         console.log(data);
         nodeData = data;
-        preprocessData(nodeData, nodeLookup);   // transform data into the format we want
+        loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
         //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
         fakeRoot = transformToNested(nodeData);
         console.log(nodeData);
