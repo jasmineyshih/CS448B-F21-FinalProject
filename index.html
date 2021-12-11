@@ -293,9 +293,16 @@
                 var files = document.getElementById('selectFiles').files;
                 console.log(files);
                 if (files.length <= 0) {
+                    d3.select("#network").selectAll('g').remove()
+                    d3.select("#bar_chart_div").select('svg').remove()
+                    d3.select("#levelBarContainer").select('svg').selectAll('*').remove()
                     defaultViz()
                     return false;
                 }
+
+                d3.select("#network").selectAll('g').remove()
+                d3.select("#bar_chart_div").select('svg').remove()
+                d3.select("#levelBarContainer").select('svg').selectAll('*').remove()
 
                 var fr = new FileReader();
 
