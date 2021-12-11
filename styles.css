@@ -274,3 +274,26 @@ button:disabled {
     overflow: hidden;
     font-family: 'Montserrat', sans-serif;
 }
+
+#selectFiles::-webkit-file-upload-button {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding: 5px;
+    background-color: rgb(10, 46, 77);
+    border-radius: 5px 5px 5px 5px ;
+    border: none;
+    color: white;
+}
+
+#import{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding: 5px;
+    background-color: rgb(10, 46, 77);
+    border-radius: 5px 5px 5px 5px ;
+    border: none;
+    color: white;
+}
+  

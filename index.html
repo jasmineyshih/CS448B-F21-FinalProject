@@ -294,6 +294,7 @@
                 var files = document.getElementById('selectFiles').files;
                 console.log(files);
                 if (files.length <= 0) {
+                    defaultViz()
                     return false;
                 }
 
@@ -329,27 +330,29 @@
                 fr.readAsText(files.item(0));
             };
     
-    // d3.json("data/urban_dictionary_tweets_and_followers.json").then(function(data) {
-    //     // TODO: delete nodeData = data.nodes;
-    //     // TODO: delete linkData = data.links;
-    //     console.log(data);
-    //     nodeData = data;
-    //     loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
-    //     //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
-    //     fakeRoot = transformToNested(nodeData);
-    //     console.log(nodeData);
-    //     computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);
-    //     tree = Tree(fakeRoot, {
-    //         /*label: d => d.id,*/
-    //         sort: (a, b) => a.timestamp - b.timestamp,
-    //         width: networkGraphWidth,
-    //         height: networkGraphHeight,
-    //         r: maxRadius
-    //     });
-    //     drawTimestampBarChart(nodeData);
-    //     //drawLevelBars(tree)   /* this is now drawn in the tree function */
-    //     console.log(fakeRoot);
-    // });
+    function defaultViz(){
+        d3.json("data/urban_dictionary_tweets_and_followers.json").then(function(data) {
+            // TODO: delete nodeData = data.nodes;
+            // TODO: delete linkData = data.links;
+            console.log(data);
+            nodeData = data;
+            loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
+            //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
+            fakeRoot = transformToNested(nodeData);
+            console.log(nodeData);
+            computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);
+            tree = Tree(fakeRoot, {
+                /*label: d => d.id,*/
+                sort: (a, b) => a.timestamp - b.timestamp,
+                width: networkGraphWidth,
+                height: networkGraphHeight,
+                r: maxRadius
+            });
+            drawTimestampBarChart(nodeData);
+            //drawLevelBars(tree)   /* this is now drawn in the tree function */
+            console.log(fakeRoot);
+        });
+    }
 </script>
 </body>
 </html>
