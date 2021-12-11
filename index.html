@@ -23,6 +23,10 @@
 <div id='complete_tool'>
     <div id="barchart_side_bar">
         <div class="sidebar" id="sidebarTool">
+            <div id="upload_options">
+                <input type="file" id="selectFiles" value="Import" />
+                <button id="import">Visualize</button>
+            </div>
             <div style="margin: 5px 10px 0px 10px; font-weight: bold;">Control Options for Viral Hashtag Progression Visualizer</div>
             <div class="vizOptionsContainer">
                 <div>Use divergent coloring on</div>
@@ -284,12 +288,25 @@
     var nodeLookup = {};    // maps node id to node object for easy lookup
     var fakeRoot;   // used to store all level 0 nodes as children for easier drawing
     var tree;   // used to store all level 0 nodes as children for easier drawing
-    
-    d3.json("data/urban_dictionary_tweets_and_followers.json").then(function(data) {
-        // TODO: delete nodeData = data.nodes;
-        // TODO: delete linkData = data.links;
-        console.log(data);
-        nodeData = data;
+
+    document.getElementById('import').onclick = function() {
+                var files = document.getElementById('selectFiles').files;
+                console.log(files);
+                if (files.length <= 0) {
+                    return false;
+                }
+
+                var fr = new FileReader();
+
+                fr.onload = function(e) { 
+                var data = null
+                console.log(e);
+                    result = JSON.parse(e.target.result);
+                    var formatted = JSON.stringify(result, null, 2);
+                    data = JSON.parse(formatted)
+                        // document.getElementById('result').value = formatted;
+                    console.log(data)
+                    nodeData = data;
         loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
         console.log(loneNodes);
         //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
@@ -306,7 +323,32 @@
         drawTimestampBarChart(nodeData);
         //drawLevelBars(tree)   /* this is now drawn in the tree function */
         console.log(fakeRoot);
-    });
+                }
+
+                fr.readAsText(files.item(0));
+            };
+    
+    // d3.json("data/urban_dictionary_tweets_and_followers.json").then(function(data) {
+    //     // TODO: delete nodeData = data.nodes;
+    //     // TODO: delete linkData = data.links;
+    //     console.log(data);
+    //     nodeData = data;
+    //     loneNodes = preprocessData(nodeData, nodeLookup);   // transform data into the format we want
+    //     //nodeData.forEach(item => item.timestamp = item.timestamp*1000) //get rid of this line later, we expect the timestamp to be in millis by default
+    //     fakeRoot = transformToNested(nodeData);
+    //     console.log(nodeData);
+    //     computeDegreeOfContributionForAllNodes(nodeData, nodeLookup);
+    //     tree = Tree(fakeRoot, {
+    //         /*label: d => d.id,*/
+    //         sort: (a, b) => a.timestamp - b.timestamp,
+    //         width: networkGraphWidth,
+    //         height: networkGraphHeight,
+    //         r: maxRadius
+    //     });
+    //     drawTimestampBarChart(nodeData);
+    //     //drawLevelBars(tree)   /* this is now drawn in the tree function */
+    //     console.log(fakeRoot);
+    // });
 </script>
 </body>
 </html>
