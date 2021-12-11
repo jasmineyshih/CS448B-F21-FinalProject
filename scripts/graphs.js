@@ -115,7 +115,14 @@ function Tree(data, { // data is in hierarchy (nested objects) form
         .attr("text-anchor","end")
         .style("font-size", "20px")
         .text("Rank of number of nodes");
-        
+    d3.select("#levelBarColors")
+        .style("grid-template-columns", nodesPerLevel.map(level => "1fr").join(" "))
+        .selectAll("div")
+        .data(nodesPerLevel)
+        .enter()
+        .append("div")
+        .style("background-color", "darkblue")
+        .style("opacity", (d, i) => (totalLevels - i) / totalLevels);
     /* done drawing level bars */
 
     svg.append("g")
