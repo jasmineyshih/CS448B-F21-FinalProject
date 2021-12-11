@@ -6,18 +6,20 @@ import json, time
 
 
 #Creds - Jasmine
-# consumer_key = "kEHSuoqKADFP5KK0X5EZ2HzaW"
-# consumer_secret = "Xd3YrIo1gDj4aFeaxlfWwVP0CS6x4KyesMXrTtFxB8MnXieEHt"
-# access_token = "2328202038-0Sm5cVuNianmAmiBCLhNcHsNmbWtMIwxfrPLyzQ"
-# access_token_secret = "91REr5tTCdvm5tK7O3WTZaQqQIFHPjEb87ldgSj9iOY4U"
+# consumer_key = 
+# consumer_secret = 
+# access_token = 
+# access_token_secret = 
 #____________________________________
 
 
+#Uncomment and use your own key
+
 #Creds - Ahsan
-consumer_key = "yt6ZBzuavluQsJ71N45e9EYSx"
-consumer_secret = "BCty3iMFqV1DBC5WWLm7BcbNYWZG7nbQ3Gmonrqh54gSXYn6pu"
-access_token = "270518822-vMPFa5PwAjm2cBri9FXuW25iKtlL5wwmDJYj4clk"
-access_token_secret = "Vt2Kci9ElHwzY9er63wRLk3ruPgDBO1wvd4Wcm9kVe0zf"
+# consumer_key = "key"
+# consumer_secret = "secret"
+# access_token = "token"
+# access_token_secret = "shhhh"
 #_____________________________________
 
 
