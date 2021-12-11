@@ -151,7 +151,7 @@ function updateEdgeColors(type) {
 }
 function updateSelectedNode(event, d) {
     selectedNodesIds.forEach(id => {
-        d3.select("#circle" + id).classed("selectedNode", false);
+        d3.select("#circle" + id).classed("highlightedNodes", false);
         d3.selectAll(`.from${id},.to${id}`)
             .classed("highlightedEdges", false);
     })
@@ -168,13 +168,16 @@ function updateSelectedNode(event, d) {
         let selectedNodeObj = nodeLookup[selectedNodeId];
         d3.select("#collapseExpandButton")
             .classed("showButton", true)
-            .html(selectedNodeObj.collapsed ? "Expand selected node" : "Collapse selected node")
+            .html(selectedNodeObj.collapsed ? "Expand Selected Node" : "Collapse Selected Node")
             .attr("disabled", selectedNodeObj.children.length > 0 ? null : "");
+        d3.select("#deselectNodesButton")
+            .attr("disabled", selectedNodeId ? null : "");
     }
     d3.select("#idField").html(d.data.id);
     d3.select("#timestampField").html(d.data.timeString);
     d3.select("#numLikesField").html(d.data.numLikes);
     d3.select("#numCommentsField").html(d.data.numComments);
+    d3.select("#numFollowersField").html(d.data.numFollowers);
     d3.select("#degContributionField").html(d.data.degOfContribution);
     event.stopPropagation();
 }
@@ -186,19 +189,28 @@ function attemptDeselectNodes() {   // mouse click on empty space in the svg
 };
 
 function deselectSelectedNodes() {
-    d3.select("#collapseExpandButton").classed("showButton", false);
-    d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
-    selectedNodeId = null;
-    selectedNodesIds.forEach(id => {
-        d3.select("#circle" + id).classed("selectedNode", false);
-        d3.selectAll(`.from${id},.to${id}`)
-            .classed("highlightedEdges", false);
-    })
-    selectedNodesIds.length = 0
+    d3.select("#collapseExpandButton")
+        .html("Select a Node to Collapse")
+        .attr("disabled", "");
+    if (selectedNodeId) {
+        d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
+        selectedNodeId = null;
+        d3.select("#deselectNodesButton")
+            .attr("disabled", selectedNodeId ? null : "");
+    }
+    if (selectedNodesIds.length > 0) {
+        selectedNodesIds.forEach(id => {
+            d3.select("#circle" + id).classed("highlightedNodes", false);
+            d3.selectAll(`.from${id},.to${id}`)
+                .classed("highlightedEdges", false);
+        });
+        selectedNodesIds.length = 0;
+    }
     d3.select("#idField").html("");
     d3.select("#timestampField").html("");
     d3.select("#numLikesField").html("");
     d3.select("#numCommentsField").html("");
+    d3.select("#numFollowersField").html("");
     d3.select("#degContributionField").html("");
     d3.selectAll(".highlightedEdges").classed("highlightedEdges", false); // dehighlight all edges if no node is selected now
     d3.selectAll(".dimmedEdges").classed("dimmedEdges", false); // undim all edges if no node is selected now
@@ -268,7 +280,7 @@ function collapseOrExpandSelectedNode() {
         nodeQueue = nodeQueue.concat(nodeLookup[currNodeId].allChildren.map(childId => nodeLookup[childId]));
     }
     d3.select("#collapseExpandButton")
-        .html(newStateIsCollapse ? "Expand selected node" : "Collapse selected node");
+        .html(newStateIsCollapse ? "Expand Selected Node" : "Collapse Selected Node");
     selectedNode.collapsed = newStateIsCollapse;
 }
 
@@ -291,7 +303,7 @@ function setNodesPerLevel(treeHierarchy){
     let prevCount = 0
     levelMap.forEach((value, key)=>{
         if(key !== 0){
-            let growth =  prevCount == 0? "Inf": Math.floor((value.count - prevCount)*100/prevCount)
+            let growth =  prevCount == 0? "N/A": Math.floor((value.count - prevCount)*100/prevCount)
             nodesPerLevel.push(
                 {
                     "level": key,
@@ -299,8 +311,8 @@ function setNodesPerLevel(treeHierarchy){
                     "xPos": value.xPos,
                     "growth": growth
                 }
-            )
-            prevCount = value.count                                       
+            );
+            prevCount = value.count;                                
         }
     })
 
@@ -462,21 +474,23 @@ function selectTimeStampByMinute(originalData, updatableData, minute, hour,date,
 }
 
 function selectedNodesByTimestamps(event, dataVals) {
-    if (selectedNodeId) {
+    /*if (selectedNodeId) {
         d3.select("#circle" + selectedNodeId).classed("selectedNode", false);
         d3.selectAll(`.from${selectedNodeId},.to${selectedNodeId}`)
             .classed("highlightedEdges", false);
-    }
+        selectedNodeId = null;
+    }*/
+    deselectSelectedNodes();
     d3.selectAll("path").classed("dimmedEdges", true);
     selectedNodesIds.forEach(id => {
-        d3.select("#circle" + id).classed("selectedNode", false);
+        d3.select("#circle" + id).classed("highlightedNodes", false);
         d3.selectAll(`.from${id},.to${id}`)
             .classed("highlightedEdges", false);
     })
     selectedNodesIds.length = 0
     dataVals.forEach(data =>{
         data.timestamps.forEach(item =>{
-            d3.select("#circle" + item.nodeId).classed("selectedNode", true);
+            d3.select("#circle" + item.nodeId).classed("highlightedNodes", true);
             selectedNodesIds.push(item.nodeId);
             d3.selectAll(`.from${item.nodeId},.to${item.nodeId}`)
                 .classed("highlightedEdges", true);
@@ -522,4 +536,20 @@ function goBack(e){
 function zoom(event) {
     d3.select("#network").selectAll("g").attr("transform", event.transform);
     d3.select("#levelBar").selectAll("rect").attr("transform", `translate(${event.transform.x},0) scale(${event.transform.k})`);
+    d3.select("#levelBar").select("text").attr("transform", `translate(${event.transform.x},0) scale(${event.transform.k})`);
+}
+
+function showOrHideLegend() {
+    showLegend = showLegend ? false : true;
+    if (showLegend) {
+        d3.select("#legend")
+            .style("display", "block");
+        d3.select("#legendButton")
+            .html("❎");
+    } else {
+        d3.select("#legend")
+            .style("display", "none");
+        d3.select("#legendButton")
+            .html("ℹ️");
+    }
 }
